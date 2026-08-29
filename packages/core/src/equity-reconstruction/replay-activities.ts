@@ -1,6 +1,7 @@
 import { domainErrorSchema, type Diagnostic } from '@trade-normalizer/schemas';
 import { Decimal } from 'decimal.js';
 
+import { allocateRemainingFee } from './fee-allocation.js';
 import type {
   EligibleEquityTradeActivity,
   EquityLot,
@@ -18,6 +19,8 @@ interface MutableEquityLot {
   readonly originalQuantity: Decimal;
   remainingQuantity: Decimal;
   readonly entryPrice: Decimal;
+  readonly entryFees: Decimal | undefined;
+  remainingEntryFees: Decimal | undefined;
   readonly provenance: EquityLot['provenance'];
 }
 
@@ -27,6 +30,7 @@ interface MutablePositionState {
   readonly lots: MutableEquityLot[];
   readonly matches: EquityLotMatch[];
   grossRealizedPnl: Decimal;
+  netRealizedPnl: Decimal | undefined;
 }
 
 function mapKey(activity: EligibleEquityTradeActivity): string {
@@ -89,12 +93,15 @@ function addBuy(position: MutablePositionState, activity: EligibleEquityTradeAct
     originalQuantity: activity.quantity,
     remainingQuantity: activity.quantity,
     entryPrice: activity.price,
+    entryFees: activity.fees?.total,
+    remainingEntryFees: activity.fees?.total,
     provenance: activity.provenance,
   });
 }
 
 function applySell(position: MutablePositionState, activity: EligibleEquityTradeActivity): void {
   let quantityToMatch = activity.quantity;
+  let remainingExitFees = activity.fees?.total;
   let matchIndex = position.matches.length;
 
   for (const lot of position.lots) {
@@ -109,6 +116,20 @@ function applySell(position: MutablePositionState, activity: EligibleEquityTrade
     const entryCostBasis = lot.entryPrice.times(matchedQuantity);
     const exitProceeds = activity.price.times(matchedQuantity);
     const grossRealizedPnl = exitProceeds.minus(entryCostBasis);
+    const entryFeeAllocation = allocateRemainingFee(
+      lot.remainingEntryFees,
+      matchedQuantity,
+      lot.remainingQuantity,
+    );
+    const exitFeeAllocation = allocateRemainingFee(
+      remainingExitFees,
+      matchedQuantity,
+      quantityToMatch,
+    );
+    const netRealizedPnl =
+      entryFeeAllocation.allocated === undefined || exitFeeAllocation.allocated === undefined
+        ? undefined
+        : grossRealizedPnl.minus(entryFeeAllocation.allocated).minus(exitFeeAllocation.allocated);
     const match: EquityLotMatch = {
       id: `match:${lot.openingActivityId}:${activity.id}:${matchIndex}`,
       instrument: activity.instrument,
@@ -120,11 +141,24 @@ function applySell(position: MutablePositionState, activity: EligibleEquityTrade
       entryCostBasis,
       exitProceeds,
       grossRealizedPnl,
+      ...(entryFeeAllocation.allocated === undefined
+        ? {}
+        : { entryFees: entryFeeAllocation.allocated }),
+      ...(exitFeeAllocation.allocated === undefined
+        ? {}
+        : { exitFees: exitFeeAllocation.allocated }),
+      ...(netRealizedPnl === undefined ? {} : { netRealizedPnl }),
     };
 
     lot.remainingQuantity = lot.remainingQuantity.minus(matchedQuantity);
+    lot.remainingEntryFees = entryFeeAllocation.remaining;
     quantityToMatch = quantityToMatch.minus(matchedQuantity);
+    remainingExitFees = exitFeeAllocation.remaining;
     position.grossRealizedPnl = position.grossRealizedPnl.plus(grossRealizedPnl);
+    position.netRealizedPnl =
+      position.netRealizedPnl === undefined || netRealizedPnl === undefined
+        ? undefined
+        : position.netRealizedPnl.plus(netRealizedPnl);
     position.matches.push(match);
     matchIndex += 1;
   }
@@ -136,6 +170,12 @@ function snapshot(position: MutablePositionState): EquityPositionState {
     (costBasis, lot) => costBasis.plus(lot.entryPrice.times(lot.remainingQuantity)),
     new Decimal(0),
   );
+  const hasUnknownRemainingFees = position.lots.some(
+    (lot) => !lot.remainingQuantity.isZero() && lot.remainingEntryFees === undefined,
+  );
+  const remainingEntryFees = hasUnknownRemainingFees
+    ? undefined
+    : position.lots.reduce((fees, lot) => fees.plus(lot.remainingEntryFees ?? 0), new Decimal(0));
 
   return {
     key: position.key,
@@ -143,7 +183,22 @@ function snapshot(position: MutablePositionState): EquityPositionState {
     openQuantity: quantity,
     remainingCostBasis,
     grossRealizedPnl: position.grossRealizedPnl,
-    lots: position.lots,
+    ...(remainingEntryFees === undefined ? {} : { remainingEntryFees }),
+    ...(position.netRealizedPnl === undefined ? {} : { netRealizedPnl: position.netRealizedPnl }),
+    lots: position.lots.map((lot) => ({
+      id: lot.id,
+      instrument: lot.instrument,
+      openingActivityId: lot.openingActivityId,
+      openedOn: lot.openedOn,
+      originalQuantity: lot.originalQuantity,
+      remainingQuantity: lot.remainingQuantity,
+      entryPrice: lot.entryPrice,
+      ...(lot.entryFees === undefined ? {} : { entryFees: lot.entryFees }),
+      ...(lot.remainingEntryFees === undefined
+        ? {}
+        : { remainingEntryFees: lot.remainingEntryFees }),
+      provenance: lot.provenance,
+    })),
     matches: position.matches,
   };
 }
@@ -170,6 +225,7 @@ export function replayEquityActivities(
           lots: [],
           matches: [],
           grossRealizedPnl: new Decimal(0),
+          netRealizedPnl: new Decimal(0),
         };
         positions.set(key, position);
       }

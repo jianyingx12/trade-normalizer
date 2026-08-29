@@ -37,6 +37,8 @@ export interface EquityLot {
   readonly originalQuantity: Decimal;
   readonly remainingQuantity: Decimal;
   readonly entryPrice: Decimal;
+  readonly entryFees?: Decimal;
+  readonly remainingEntryFees?: Decimal;
   readonly provenance: SourceProvenance;
 }
 
@@ -52,6 +54,9 @@ export interface EquityLotMatch {
   readonly entryCostBasis: Decimal;
   readonly exitProceeds: Decimal;
   readonly grossRealizedPnl: Decimal;
+  readonly entryFees?: Decimal;
+  readonly exitFees?: Decimal;
+  readonly netRealizedPnl?: Decimal;
 }
 
 /** Deterministic accounting state for one broker account and equity symbol. */
@@ -61,6 +66,8 @@ export interface EquityPositionState {
   readonly openQuantity: Decimal;
   readonly remainingCostBasis: Decimal;
   readonly grossRealizedPnl: Decimal;
+  readonly remainingEntryFees?: Decimal;
+  readonly netRealizedPnl?: Decimal;
   readonly lots: readonly EquityLot[];
   readonly matches: readonly EquityLotMatch[];
 }

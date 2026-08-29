@@ -19,6 +19,16 @@ const baseActivity: BrokerActivityInput = {
   provenance: { sourceIndex: 0 },
 };
 
+function fees(total: string): NonNullable<BrokerActivityInput['fees']> {
+  return {
+    commission: total,
+    regulatory: '0',
+    contract: '0',
+    other: '0',
+    total,
+  };
+}
+
 function prepared(overrides: readonly Partial<BrokerActivityInput>[]) {
   const activities = overrides.map((override, index) =>
     brokerActivitySchema.parse({
@@ -178,5 +188,79 @@ describe('replayEquityActivities', () => {
 
     expect(matchedQuantity.plus(position?.openQuantity ?? 0).equals(boughtQuantity)).toBe(true);
     expect(matchedCost.plus(position?.remainingCostBasis ?? 0).equals(originalCost)).toBe(true);
+  });
+
+  it('allocates known entry and exit fees and calculates net realized P&L', () => {
+    const result = replayEquityActivities(
+      prepared([
+        { id: 'buy', quantity: '3', price: '10', fees: fees('0.30') },
+        { id: 'sell', side: 'sell', quantity: '1', price: '12', fees: fees('0.10') },
+      ]),
+    );
+    const match = result.matches[0];
+    const position = result.positions[0];
+
+    expect(match?.entryFees?.toString()).toBe('0.1');
+    expect(match?.exitFees?.toString()).toBe('0.1');
+    expect(match?.grossRealizedPnl.toString()).toBe('2');
+    expect(match?.netRealizedPnl?.toString()).toBe('1.8');
+    expect(position?.remainingEntryFees?.toString()).toBe('0.2');
+    expect(position?.netRealizedPnl?.toString()).toBe('1.8');
+  });
+
+  it('keeps net P&L unknown when either side has no source-provided fees', () => {
+    const missingEntryFees = replayEquityActivities(
+      prepared([
+        { id: 'buy', quantity: '1', price: '10' },
+        { id: 'sell', side: 'sell', quantity: '1', price: '12', fees: fees('0') },
+      ]),
+    );
+    const missingExitFees = replayEquityActivities(
+      prepared([
+        { id: 'buy', quantity: '1', price: '10', fees: fees('0') },
+        { id: 'sell', side: 'sell', quantity: '1', price: '12' },
+      ]),
+    );
+
+    expect(missingEntryFees.matches[0]?.netRealizedPnl).toBeUndefined();
+    expect(missingEntryFees.positions[0]?.netRealizedPnl).toBeUndefined();
+    expect(missingExitFees.matches[0]?.netRealizedPnl).toBeUndefined();
+    expect(missingExitFees.positions[0]?.netRealizedPnl).toBeUndefined();
+  });
+
+  it('distinguishes explicitly known zero fees from missing fees', () => {
+    const result = replayEquityActivities(
+      prepared([
+        { id: 'buy', quantity: '1', price: '10', fees: fees('0') },
+        { id: 'sell', side: 'sell', quantity: '1', price: '12', fees: fees('0') },
+      ]),
+    );
+
+    expect(result.matches[0]?.entryFees?.isZero()).toBe(true);
+    expect(result.matches[0]?.exitFees?.isZero()).toBe(true);
+    expect(result.matches[0]?.netRealizedPnl?.toString()).toBe('2');
+    expect(result.positions[0]?.remainingEntryFees?.isZero()).toBe(true);
+  });
+
+  it('conserves buy and sell fee totals across multiple FIFO matches', () => {
+    const result = replayEquityActivities(
+      prepared([
+        { id: 'buy-1', quantity: '1', price: '10', fees: fees('0.10') },
+        { id: 'buy-2', quantity: '2', price: '11', fees: fees('0.20') },
+        { id: 'sell', side: 'sell', quantity: '3', price: '12', fees: fees('0.17') },
+      ]),
+    );
+    const totalEntryFees = result.matches.reduce(
+      (total, match) => total.plus(match.entryFees ?? 0),
+      new Decimal(0),
+    );
+    const totalExitFees = result.matches.reduce(
+      (total, match) => total.plus(match.exitFees ?? 0),
+      new Decimal(0),
+    );
+
+    expect(totalEntryFees.toString()).toBe('0.3');
+    expect(totalExitFees.toString()).toBe('0.17');
+    expect(result.positions[0]?.remainingEntryFees?.isZero()).toBe(true);
   });
 });
