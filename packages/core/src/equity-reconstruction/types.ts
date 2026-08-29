@@ -102,3 +102,8 @@ export interface EquityReplayResult {
   readonly lifecycles: readonly EquityPositionLifecycle[];
   readonly diagnostics: readonly Diagnostic[];
 }
+
+/** Public result returned after eligibility checks, ordering, and FIFO replay. */
+export interface EquityReconstructionResult extends EquityReplayResult {
+  readonly openLots: readonly EquityLot[];
+}
