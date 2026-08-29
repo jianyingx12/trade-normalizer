@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "declaration": false,
+    "declarationMap": false,
+    "noEmit": true,
+    "paths": {
+      "@trade-normalizer/core": ["./packages/core/src/index.ts"],
+      "@trade-normalizer/schemas": ["./packages/schemas/src/index.ts"]
+    },
+    "types": ["node", "vitest/globals"]
+  },
+  "include": ["packages/**/*.ts", "vitest.config.ts"]
+}

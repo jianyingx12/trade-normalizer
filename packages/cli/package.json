@@ -1,0 +1,20 @@
+{
+  "name": "@trade-normalizer/cli",
+  "version": "0.0.0",
+  "description": "Command-line interface for Trade Normalizer",
+  "license": "MIT",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "bin": {
+    "trade-normalizer": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "commander": "^15.0.0"
+  }
+}

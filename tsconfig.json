@@ -1,0 +1,11 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/schemas" },
+    { "path": "./packages/core" },
+    { "path": "./packages/cli" },
+    { "path": "./packages/adapters/robinhood" },
+    { "path": "./packages/adapters/ibkr" },
+    { "path": "./packages/adapters/webull" }
+  ]
+}
