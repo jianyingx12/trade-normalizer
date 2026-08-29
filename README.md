@@ -3,9 +3,9 @@
 Universal Trade Normalizer is an open-source TypeScript library and CLI for converting
 broker-specific trade exports into a deterministic canonical format.
 
-The project is currently in its foundation phase. Broker parsing, position and trade
-reconstruction, options strategy detection, and profit-and-loss calculations have not yet been
-implemented.
+The repository foundation and canonical schema phase are complete. Broker parsing, activity
+interpretation, position and trade reconstruction, options strategy detection, and profit-and-loss
+calculations have not yet been implemented.
 
 ## Goals
 
@@ -58,5 +58,6 @@ pnpm check
 
 ## Current Scope
 
-Only repository tooling and package boundaries are established. Domain schemas and trade
-normalization behavior will be introduced in later phases.
+Repository tooling, package boundaries, canonical instruments, broker activities, executions,
+trades, fees, and diagnostics are defined and runtime-validated. Broker adapters and all
+reconstruction behavior remain future work.

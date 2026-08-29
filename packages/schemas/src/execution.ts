@@ -11,16 +11,10 @@ import {
   positionEffectSchema,
   positiveDecimalSchema,
 } from './primitives.js';
+import { sourceProvenanceSchema } from './provenance.js';
 
-export const executionProvenanceSchema = z
-  .object({
-    brokerTransactionId: z.string().trim().min(1).max(256).optional(),
-    sourceFile: z.string().trim().min(1).max(1024).optional(),
-    sourceIndex: z.number().int().nonnegative(),
-    sourceRow: z.number().int().positive().optional(),
-    rawReference: z.string().trim().min(1).max(2048).optional(),
-  })
-  .strict();
+/** @deprecated Use sourceProvenanceSchema for new canonical source records. */
+export const executionProvenanceSchema = sourceProvenanceSchema;
 
 export const executionSchema = z
   .object({
