@@ -19,6 +19,7 @@
     "build": "tsc -b"
   },
   "dependencies": {
-    "@trade-normalizer/core": "workspace:*"
+    "@trade-normalizer/core": "workspace:*",
+    "csv-parse": "^7.0.2"
   }
 }
