@@ -2,6 +2,13 @@ import { domainErrorSchema, type Diagnostic } from '@trade-normalizer/schemas';
 import { Decimal } from 'decimal.js';
 
 import { allocateRemainingFee } from './fee-allocation.js';
+import {
+  closeEquityLifecycle,
+  createEquityLifecycle,
+  recordLifecycleActivity,
+  snapshotEquityLifecycle,
+  type MutableEquityLifecycle,
+} from './lifecycle-state.js';
 import type {
   EligibleEquityTradeActivity,
   EquityLot,
@@ -13,6 +20,7 @@ import type {
 
 interface MutableEquityLot {
   readonly id: string;
+  readonly lifecycleId: string;
   readonly instrument: EquityLot['instrument'];
   readonly openingActivityId: string;
   readonly openedOn: string;
@@ -29,6 +37,7 @@ interface MutablePositionState {
   readonly instrument: EquityPositionState['instrument'];
   readonly lots: MutableEquityLot[];
   readonly matches: EquityLotMatch[];
+  readonly lifecycles: MutableEquityLifecycle[];
   grossRealizedPnl: Decimal;
   netRealizedPnl: Decimal | undefined;
 }
@@ -84,9 +93,14 @@ function negativePositionDiagnostic(
   });
 }
 
-function addBuy(position: MutablePositionState, activity: EligibleEquityTradeActivity): void {
+function addBuy(
+  position: MutablePositionState,
+  lifecycle: MutableEquityLifecycle,
+  activity: EligibleEquityTradeActivity,
+): void {
   position.lots.push({
     id: `lot:${activity.id}`,
+    lifecycleId: lifecycle.id,
     instrument: activity.instrument,
     openingActivityId: activity.id,
     openedOn: activity.activityDate,
@@ -99,7 +113,11 @@ function addBuy(position: MutablePositionState, activity: EligibleEquityTradeAct
   });
 }
 
-function applySell(position: MutablePositionState, activity: EligibleEquityTradeActivity): void {
+function applySell(
+  position: MutablePositionState,
+  lifecycle: MutableEquityLifecycle,
+  activity: EligibleEquityTradeActivity,
+): void {
   let quantityToMatch = activity.quantity;
   let remainingExitFees = activity.fees?.total;
   let matchIndex = position.matches.length;
@@ -132,6 +150,7 @@ function applySell(position: MutablePositionState, activity: EligibleEquityTrade
         : grossRealizedPnl.minus(entryFeeAllocation.allocated).minus(exitFeeAllocation.allocated);
     const match: EquityLotMatch = {
       id: `match:${lot.openingActivityId}:${activity.id}:${matchIndex}`,
+      lifecycleId: lifecycle.id,
       instrument: activity.instrument,
       openingActivityId: lot.openingActivityId,
       closingActivityId: activity.id,
@@ -177,6 +196,20 @@ function snapshot(position: MutablePositionState): EquityPositionState {
     ? undefined
     : position.lots.reduce((fees, lot) => fees.plus(lot.remainingEntryFees ?? 0), new Decimal(0));
 
+  const lots: EquityLot[] = position.lots.map((lot) => ({
+    id: lot.id,
+    lifecycleId: lot.lifecycleId,
+    instrument: lot.instrument,
+    openingActivityId: lot.openingActivityId,
+    openedOn: lot.openedOn,
+    originalQuantity: lot.originalQuantity,
+    remainingQuantity: lot.remainingQuantity,
+    entryPrice: lot.entryPrice,
+    ...(lot.entryFees === undefined ? {} : { entryFees: lot.entryFees }),
+    ...(lot.remainingEntryFees === undefined ? {} : { remainingEntryFees: lot.remainingEntryFees }),
+    provenance: lot.provenance,
+  }));
+
   return {
     key: position.key,
     instrument: position.instrument,
@@ -185,21 +218,11 @@ function snapshot(position: MutablePositionState): EquityPositionState {
     grossRealizedPnl: position.grossRealizedPnl,
     ...(remainingEntryFees === undefined ? {} : { remainingEntryFees }),
     ...(position.netRealizedPnl === undefined ? {} : { netRealizedPnl: position.netRealizedPnl }),
-    lots: position.lots.map((lot) => ({
-      id: lot.id,
-      instrument: lot.instrument,
-      openingActivityId: lot.openingActivityId,
-      openedOn: lot.openedOn,
-      originalQuantity: lot.originalQuantity,
-      remainingQuantity: lot.remainingQuantity,
-      entryPrice: lot.entryPrice,
-      ...(lot.entryFees === undefined ? {} : { entryFees: lot.entryFees }),
-      ...(lot.remainingEntryFees === undefined
-        ? {}
-        : { remainingEntryFees: lot.remainingEntryFees }),
-      provenance: lot.provenance,
-    })),
+    lots,
     matches: position.matches,
+    lifecycles: position.lifecycles.map((lifecycle) =>
+      snapshotEquityLifecycle(lifecycle, lots, position.matches),
+    ),
   };
 }
 
@@ -224,12 +247,18 @@ export function replayEquityActivities(
           instrument: activity.instrument,
           lots: [],
           matches: [],
+          lifecycles: [],
           grossRealizedPnl: new Decimal(0),
           netRealizedPnl: new Decimal(0),
         };
         positions.set(key, position);
       }
-      addBuy(position, activity);
+      if (openQuantity(position).isZero()) {
+        position.lifecycles.push(createEquityLifecycle(activity, position.key));
+      } else {
+        recordLifecycleActivity(position.lifecycles.at(-1)!, activity);
+      }
+      addBuy(position, position.lifecycles.at(-1)!, activity);
       continue;
     }
 
@@ -248,7 +277,12 @@ export function replayEquityActivities(
       continue;
     }
 
-    applySell(position, activity);
+    const lifecycle = position.lifecycles.at(-1)!;
+    recordLifecycleActivity(lifecycle, activity);
+    applySell(position, lifecycle, activity);
+    if (openQuantity(position).isZero()) {
+      closeEquityLifecycle(lifecycle, activity);
+    }
   }
 
   const positionSnapshots = [...positions.values()].map(snapshot);
@@ -256,6 +290,7 @@ export function replayEquityActivities(
   return {
     positions: positionSnapshots,
     matches: positionSnapshots.flatMap((position) => position.matches),
+    lifecycles: positionSnapshots.flatMap((position) => position.lifecycles),
     diagnostics,
   };
 }

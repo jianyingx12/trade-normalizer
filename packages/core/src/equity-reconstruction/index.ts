@@ -5,6 +5,7 @@ export type {
   EquityLot,
   EquityLotMatch,
   EquityPositionKey,
+  EquityPositionLifecycle,
   EquityPositionState,
   EquityReplayResult,
   PreparedEquityActivities,
