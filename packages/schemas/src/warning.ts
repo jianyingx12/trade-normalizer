@@ -23,6 +23,7 @@ export const diagnosticCodeSchema = z.enum([
   'AMOUNT_RECONCILIATION_MISMATCH',
   'INCOMPLETE_TRADE_ACTIVITY',
   'UNSUPPORTED_ASSET_TYPE',
+  'SELL_WITHOUT_OPEN_POSITION',
 ]);
 
 const diagnosticContextShape = {
