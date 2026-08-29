@@ -18,5 +18,8 @@
   "scripts": {
     "build": "tsc -b"
   },
-  "dependencies": {}
+  "dependencies": {
+    "decimal.js": "^10.6.0",
+    "zod": "^4.5.1"
+  }
 }
