@@ -21,6 +21,8 @@ export const diagnosticCodeSchema = z.enum([
   'INVALID_PRICE',
   'INVALID_AMOUNT',
   'AMOUNT_RECONCILIATION_MISMATCH',
+  'INCOMPLETE_TRADE_ACTIVITY',
+  'UNSUPPORTED_ASSET_TYPE',
 ]);
 
 const diagnosticContextShape = {
