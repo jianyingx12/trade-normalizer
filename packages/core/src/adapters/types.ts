@@ -1,4 +1,4 @@
-import type { BrokerActivity, BrokerId, Diagnostic } from '@trade-normalizer/schemas';
+import type { BrokerActivity, BrokerId, Diagnostic, Execution } from '@trade-normalizer/schemas';
 
 export interface BrokerAdapterDescriptor {
   readonly broker: BrokerId;
@@ -25,9 +25,16 @@ export interface BrokerAdapterResult<TParsedRecord> extends AdapterNormalization
   readonly records: readonly TParsedRecord[];
 }
 
+export interface ExecutionAdapterNormalizationResult extends AdapterNormalizationResult {
+  readonly executions: readonly Execution[];
+}
+
+export interface ExecutionCapableBrokerAdapterResult<TParsedRecord>
+  extends BrokerAdapterResult<TParsedRecord>, ExecutionAdapterNormalizationResult {}
+
 /**
- * Public contract for adapters that normalize source records into BrokerActivity.
- * Execution promotion is deliberately outside this interface.
+ * Base public contract for adapters that normalize source records into BrokerActivity.
+ * Sources that prove fill-level facts may implement ExecutionCapableBrokerAdapter.
  */
 export interface BrokerActivityAdapter<TParsedRecord> extends BrokerAdapterDescriptor {
   detect(source: string): boolean;
@@ -37,4 +44,18 @@ export interface BrokerActivityAdapter<TParsedRecord> extends BrokerAdapterDescr
     context: AdapterSourceContext,
   ): AdapterNormalizationResult;
   adapt(source: string, context: AdapterSourceContext): BrokerAdapterResult<TParsedRecord>;
+}
+
+/** Additive capability for a source that can truthfully produce canonical executions. */
+export interface ExecutionCapableBrokerAdapter<
+  TParsedRecord,
+> extends BrokerActivityAdapter<TParsedRecord> {
+  normalize(
+    records: readonly TParsedRecord[],
+    context: AdapterSourceContext,
+  ): ExecutionAdapterNormalizationResult;
+  adapt(
+    source: string,
+    context: AdapterSourceContext,
+  ): ExecutionCapableBrokerAdapterResult<TParsedRecord>;
 }

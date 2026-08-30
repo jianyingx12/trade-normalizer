@@ -5,4 +5,7 @@ export type {
   BrokerActivityAdapter,
   BrokerAdapterDescriptor,
   BrokerAdapterResult,
+  ExecutionAdapterNormalizationResult,
+  ExecutionCapableBrokerAdapter,
+  ExecutionCapableBrokerAdapterResult,
 } from './types.js';
