@@ -60,6 +60,10 @@ export interface OptionLotMatch {
   readonly direction: OptionPositionDirection;
   readonly openingActivityId: string;
   readonly closingActivityId: string;
+  readonly closedOn: string;
+  readonly closedAt?: string;
+  readonly closingTimestampPrecision: BrokerActivity['timestampPrecision'];
+  readonly closingSourceIndex: number;
   readonly matchedQuantity: Decimal;
   readonly entryPrice: Decimal;
   readonly exitPrice: Decimal;

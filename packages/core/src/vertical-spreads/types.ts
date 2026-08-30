@@ -91,3 +91,66 @@ export interface VerticalSpreadOwnershipResult {
   readonly lotOwnership: readonly OptionLotOwnership[];
   readonly diagnostics: readonly Diagnostic[];
 }
+
+export type VerticalSpreadLifecycleStatus = 'open' | 'partially_closed' | 'closed';
+
+/** A quantity-proportional reference to accounting already performed by Phase 6. */
+export interface VerticalSpreadMatchAllocation {
+  readonly matchId: string;
+  readonly allocatedQuantity: Decimal;
+  readonly closingActivityId: string;
+  readonly closedOn: string;
+  readonly closedAt?: string;
+  readonly closingTimestampPrecision: 'date' | 'datetime';
+  readonly closingSourceIndex: number;
+  readonly closingCashFlow: Decimal;
+  readonly grossRealizedPnl: Decimal;
+  readonly realizedFees?: Decimal;
+  readonly netRealizedPnl?: Decimal;
+}
+
+export interface VerticalSpreadLifecycleLeg extends VerticalSpreadLegAllocation {
+  readonly openedOn: string;
+  readonly openedAt?: string;
+  readonly openingTimestampPrecision: 'date' | 'datetime';
+  readonly openingCashFlow: Decimal;
+  readonly closedQuantity: Decimal;
+  readonly openQuantity: Decimal;
+  readonly closingCashFlow: Decimal;
+  readonly grossRealizedPnl: Decimal;
+  readonly realizedFees?: Decimal;
+  readonly netRealizedPnl?: Decimal;
+  readonly matchAllocations: readonly VerticalSpreadMatchAllocation[];
+}
+
+/** A structural two-leg lifecycle; it does not claim broker-confirmed order intent. */
+export interface VerticalSpreadLifecycle {
+  readonly id: string;
+  readonly strategy: VerticalSpreadStrategy;
+  readonly broker: OptionPositionKey['broker'];
+  readonly accountId?: string;
+  readonly underlying: string;
+  readonly expiration: string;
+  readonly optionType: 'call' | 'put';
+  readonly multiplier: number;
+  readonly quantity: Decimal;
+  readonly closedQuantity: Decimal;
+  readonly openQuantity: Decimal;
+  readonly status: VerticalSpreadLifecycleStatus;
+  readonly openedOn: string;
+  readonly openedAt: string;
+  readonly openingTimestampPrecision: 'datetime';
+  readonly lastClosedOn?: string;
+  readonly lastClosedAt?: string;
+  readonly closingTimestampPrecision?: 'date' | 'datetime';
+  /** Premium cash flow only: inflows positive, outflows negative. */
+  readonly openingNetCashFlow: Decimal;
+  /** Premium cash flow from attributed Phase 6 closing matches. */
+  readonly closingNetCashFlow: Decimal;
+  readonly grossRealizedPnl: Decimal;
+  readonly realizedFees?: Decimal;
+  readonly netRealizedPnl?: Decimal;
+  readonly lowerStrikeLeg: VerticalSpreadLifecycleLeg;
+  readonly higherStrikeLeg: VerticalSpreadLifecycleLeg;
+  readonly evidence: VerticalSpreadCandidateEvidence;
+}
