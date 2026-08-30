@@ -59,3 +59,14 @@ export class BrokerAdapterError extends Error {
     this.broker = broker;
   }
 }
+
+export class ValidationFailedError extends Error {
+  readonly diagnostics: readonly Diagnostic[];
+
+  constructor(diagnostics: readonly Diagnostic[]) {
+    const reason = diagnostics[0]?.message ?? 'Broker input contains validation errors.';
+    super(`Validation failed: ${reason}`);
+    this.name = 'ValidationFailedError';
+    this.diagnostics = diagnostics;
+  }
+}

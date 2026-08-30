@@ -4,7 +4,6 @@ import {
   reconstructOptionPositions,
   reconstructVerticalSpreads,
   type BrokerActivity,
-  type BrokerActivityType,
   type Diagnostic,
   type OptionReconstructionResult,
   type VerticalSpreadReconstructionResult,
@@ -16,16 +15,7 @@ import {
   type NormalizationSummary,
   type NormalizeBrokerActivitiesInput,
 } from '../output/types.js';
-
-const activityTypes: readonly BrokerActivityType[] = [
-  'trade',
-  'dividend',
-  'deposit',
-  'withdrawal',
-  'fee',
-  'split',
-  'unknown',
-];
+import { countActivities } from '../summaries/activity-counts.js';
 
 function uniqueDiagnostics(diagnostics: readonly Diagnostic[]): Diagnostic[] {
   const seen = new Set<string>();
@@ -56,25 +46,14 @@ function summarize(
   trades: NormalizationEnvelope['trades'],
   diagnostics: readonly Diagnostic[],
 ): NormalizationSummary {
-  const typeCounts = Object.fromEntries(activityTypes.map((type) => [type, 0])) as Record<
-    BrokerActivityType,
-    number
-  >;
-  const assetTypes = { equity: 0, option: 0, unspecified: 0 };
-
-  for (const activity of input.activities) {
-    typeCounts[activity.activityType] += 1;
-    const assetType = activity.instrument?.assetType ?? 'unspecified';
-    assetTypes[assetType] += 1;
-  }
+  const counts = countActivities(input.activities);
 
   return {
     sourceRecords: input.sourceRecordCount,
     activities: input.activities.length,
     trades: trades.length,
     diagnostics: diagnostics.length,
-    activityTypes: typeCounts,
-    assetTypes,
+    ...counts,
   };
 }
 

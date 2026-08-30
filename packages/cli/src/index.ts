@@ -3,6 +3,8 @@
 import { Command, CommanderError } from 'commander';
 
 import { registerNormalizeCommand } from './commands/normalize.js';
+import { registerInspectCommand } from './commands/inspect.js';
+import { registerValidateCommand } from './commands/validate.js';
 
 function createProgram(): Command {
   const program = new Command()
@@ -13,6 +15,8 @@ function createProgram(): Command {
     .exitOverride();
 
   registerNormalizeCommand(program);
+  registerInspectCommand(program);
+  registerValidateCommand(program);
   return program;
 }
 
