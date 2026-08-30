@@ -1,6 +1,12 @@
 import { describe, expectTypeOf, it } from 'vitest';
 
-import { reconstructEquityPositions, type BrokerAdapterDescriptor } from './index.js';
+import {
+  createOptionInstrumentKey,
+  reconstructEquityPositions,
+  sameOptionInstrument,
+  type BrokerAdapterDescriptor,
+  type OptionInstrumentKey,
+} from './index.js';
 
 describe('@trade-normalizer/core', () => {
   it('publishes the adapter package boundary', () => {
@@ -15,5 +21,12 @@ describe('@trade-normalizer/core', () => {
     expectTypeOf<ReturnType<typeof reconstructEquityPositions>>().toHaveProperty('matches');
     expectTypeOf<ReturnType<typeof reconstructEquityPositions>>().toHaveProperty('lifecycles');
     expectTypeOf<ReturnType<typeof reconstructEquityPositions>>().toHaveProperty('diagnostics');
+  });
+
+  it('publishes canonical option identity utilities', () => {
+    expectTypeOf(createOptionInstrumentKey).toBeFunction();
+    expectTypeOf(createOptionInstrumentKey).returns.toEqualTypeOf<OptionInstrumentKey>();
+    expectTypeOf(sameOptionInstrument).toBeFunction();
+    expectTypeOf(sameOptionInstrument).returns.toBeBoolean();
   });
 });

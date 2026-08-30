@@ -9,3 +9,5 @@ export type {
   EquityPositionState,
   EquityReconstructionResult,
 } from './equity-reconstruction/types.js';
+export { createOptionInstrumentKey, sameOptionInstrument } from './option-instruments/index.js';
+export type { OptionInstrumentKey } from './option-instruments/index.js';
