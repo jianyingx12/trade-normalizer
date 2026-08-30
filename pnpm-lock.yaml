@@ -59,6 +59,9 @@ importers:
 
   packages/cli:
     dependencies:
+      '@trade-normalizer/adapter-robinhood':
+        specifier: workspace:*
+        version: link:../adapters/robinhood
       '@trade-normalizer/core':
         specifier: workspace:*
         version: link:../core
