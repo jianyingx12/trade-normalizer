@@ -1,6 +1,7 @@
 import { describe, expectTypeOf, it } from 'vitest';
 
 import {
+  buildCanonicalTrades,
   createOptionInstrumentKey,
   parseOccOptionSymbol,
   reconstructEquityPositions,
@@ -8,6 +9,7 @@ import {
   reconstructVerticalSpreads,
   sameOptionInstrument,
   type BrokerAdapterDescriptor,
+  type CanonicalTradeBuildResult,
   type OptionInstrumentKey,
   type VerticalSpreadReconstructionResult,
 } from './index.js';
@@ -56,5 +58,15 @@ describe('@trade-normalizer/core', () => {
     expectTypeOf<ReturnType<typeof reconstructVerticalSpreads>>().toHaveProperty('spreads');
     expectTypeOf<ReturnType<typeof reconstructVerticalSpreads>>().toHaveProperty('ungrouped');
     expectTypeOf<ReturnType<typeof reconstructVerticalSpreads>>().toHaveProperty('diagnostics');
+  });
+
+  it('publishes the canonical logical Trade production API', () => {
+    expectTypeOf(buildCanonicalTrades).toBeFunction();
+    expectTypeOf<
+      ReturnType<typeof buildCanonicalTrades>
+    >().toEqualTypeOf<CanonicalTradeBuildResult>();
+    expectTypeOf<ReturnType<typeof buildCanonicalTrades>>().toHaveProperty('trades');
+    expectTypeOf<ReturnType<typeof buildCanonicalTrades>>().toHaveProperty('diagnostics');
+    expectTypeOf<ReturnType<typeof buildCanonicalTrades>>().toHaveProperty('unpromoted');
   });
 });

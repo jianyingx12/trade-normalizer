@@ -6,8 +6,9 @@ broker-specific trade exports into a deterministic canonical format.
 The repository foundation, canonical schemas, a narrowly scoped Robinhood equities activity
 adapter, deterministic long-equity FIFO reconstruction, and deterministic single-contract option
 FIFO reconstruction are complete. The core also reconstructs ambiguity-safe two-leg vertical
-spread lifecycles from canonical option results. Execution promotion and canonical Trade
-production have not yet been implemented. No broker option export format is implemented yet.
+spread lifecycles from canonical option results and promotes equity, ungrouped single-option, and
+vertical-spread lifecycles into non-overlapping canonical logical Trades. Execution promotion has
+not been implemented. No broker option export format is implemented yet.
 
 ## Goals
 
@@ -81,6 +82,10 @@ preserves partial or ambiguous ownership as ungrouped, and aggregates spread cas
 P&L from the existing contract matches. Structural inference does not claim broker-confirmed order
 intent.
 
-IBKR, Webull, execution promotion, strategies beyond vertical spreads, canonical Trade promotion,
-broker-specific option parsing, exercise/assignment/expiration, and useful CLI commands remain
-future work.
+`buildCanonicalTrades` consumes all three reconstruction results and produces deterministic,
+runtime-validated logical Trades. It verifies global option ownership before promotion, preserves
+upstream diagnostics, and returns structured `unpromoted` records when inconsistent ownership or
+an isolated promotion failure makes a Trade unsafe to produce.
+
+IBKR, Webull, execution promotion, strategies beyond vertical spreads, broker-specific option
+parsing, exercise/assignment/expiration, and useful CLI commands remain future work.

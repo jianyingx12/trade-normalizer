@@ -16,6 +16,14 @@ export {
   parseOccOptionSymbol,
   sameOptionInstrument,
 } from './option-instruments/index.js';
+export { buildCanonicalTrades } from './trade-production/build-canonical-trades.js';
+export type {
+  CanonicalTradeBuildInput,
+  CanonicalTradeBuildResult,
+  UnpromotedTradeOwnership,
+  UnpromotedTradeOwnershipKind,
+  UnpromotedTradeOwnershipReason,
+} from './trade-production/types.js';
 export { reconstructVerticalSpreads } from './vertical-spreads/reconstruct-vertical-spreads.js';
 export type {
   OptionLotOwnership,
