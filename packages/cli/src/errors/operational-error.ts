@@ -22,6 +22,23 @@ export class InputFileError extends Error {
   }
 }
 
+export class OutputFileError extends Error {
+  readonly filePath: string;
+
+  constructor(filePath: string, cause?: unknown) {
+    super(`Unable to write output file: ${filePath}`, { cause });
+    this.name = 'OutputFileError';
+    this.filePath = filePath;
+  }
+}
+
+export class InputOverwriteError extends Error {
+  constructor(filePath: string) {
+    super(`Output file must not overwrite the input file: ${filePath}`);
+    this.name = 'InputOverwriteError';
+  }
+}
+
 export class BrokerInputError extends Error {
   readonly diagnostics: readonly Diagnostic[];
 

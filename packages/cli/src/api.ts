@@ -9,6 +9,8 @@ export {
   BrokerAdapterError,
   BrokerInputError,
   InputFileError,
+  InputOverwriteError,
+  OutputFileError,
   UnsupportedBrokerError,
 } from './errors/operational-error.js';
 export { normalizeBrokerActivities } from './orchestration/normalize-broker-activities.js';
