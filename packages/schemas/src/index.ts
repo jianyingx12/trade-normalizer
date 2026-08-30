@@ -1,5 +1,6 @@
 export * from './activity.js';
 export * from './execution.js';
+export * from './execution-time.js';
 export * from './fee.js';
 export * from './instrument.js';
 export * from './primitives.js';

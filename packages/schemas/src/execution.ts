@@ -1,12 +1,12 @@
 import { z } from 'zod';
 
+import { executionTimeSchema } from './execution-time.js';
 import { feeBreakdownSchema } from './fee.js';
 import { instrumentSchema } from './instrument.js';
 import {
   brokerIdSchema,
   canonicalIdSchema,
   executionSideSchema,
-  isoUtcTimestampSchema,
   nonNegativeDecimalSchema,
   positionEffectSchema,
   positiveDecimalSchema,
@@ -27,7 +27,7 @@ export const executionSchema = z
     quantity: positiveDecimalSchema,
     price: nonNegativeDecimalSchema,
     fees: feeBreakdownSchema,
-    executedAt: isoUtcTimestampSchema,
+    executionTime: executionTimeSchema,
     provenance: executionProvenanceSchema,
   })
   .strict();

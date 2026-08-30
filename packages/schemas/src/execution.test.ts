@@ -40,7 +40,10 @@ describe('execution schema', () => {
     quantity: '10',
     price: '186.70',
     fees: validFees,
-    executedAt: '2026-08-20T14:31:00.000Z',
+    executionTime: {
+      precision: 'utc_datetime',
+      timestamp: '2026-08-20T14:31:00.000Z',
+    },
     provenance: {
       brokerTransactionId: 'broker-fill-123',
       sourceFile: 'trades.csv',
@@ -56,15 +59,68 @@ describe('execution schema', () => {
     expect(execution.positionEffect).toBe('unknown');
     expect(execution.quantity.equals('10')).toBe(true);
     expect(execution.price.equals('186.70')).toBe(true);
+    expect(execution.executionTime).toEqual({
+      precision: 'utc_datetime',
+      timestamp: '2026-08-20T14:31:00.000Z',
+    });
     expect(execution.provenance.sourceIndex).toBe(4);
   });
 
-  it('rejects floating-point quantities and non-UTC timestamps', () => {
+  it('accepts a source-local datetime without fabricating UTC', () => {
+    const execution = executionSchema.parse({
+      ...validExecution,
+      executionTime: {
+        precision: 'local_datetime',
+        localDateTime: '2026-08-20T10:31:00',
+      },
+    });
+
+    expect(execution.executionTime).toEqual({
+      precision: 'local_datetime',
+      localDateTime: '2026-08-20T10:31:00',
+    });
+  });
+
+  it('accepts execution evidence with date-only precision', () => {
+    const execution = executionSchema.parse({
+      ...validExecution,
+      executionTime: {
+        precision: 'date',
+        date: '2026-08-20',
+      },
+    });
+
+    expect(execution.executionTime).toEqual({ precision: 'date', date: '2026-08-20' });
+  });
+
+  it('rejects floating-point quantities and invalid timing variants', () => {
     expect(executionSchema.safeParse({ ...validExecution, quantity: 0.1 }).success).toBe(false);
     expect(
       executionSchema.safeParse({
         ...validExecution,
-        executedAt: '2026-08-20T10:31:00-04:00',
+        executionTime: {
+          precision: 'utc_datetime',
+          timestamp: '2026-08-20T10:31:00-04:00',
+        },
+      }).success,
+    ).toBe(false);
+    expect(
+      executionSchema.safeParse({
+        ...validExecution,
+        executionTime: {
+          precision: 'local_datetime',
+          localDateTime: '2026-08-20T10:31:00Z',
+        },
+      }).success,
+    ).toBe(false);
+    expect(
+      executionSchema.safeParse({
+        ...validExecution,
+        executionTime: {
+          precision: 'date',
+          date: '2026-08-20',
+          timestamp: '2026-08-20T00:00:00.000Z',
+        },
       }).success,
     ).toBe(false);
   });
