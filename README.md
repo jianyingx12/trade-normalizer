@@ -3,9 +3,9 @@
 Universal Trade Normalizer is an open-source TypeScript library and CLI for converting
 broker-specific trade exports into a deterministic canonical format.
 
-The repository foundation, canonical schemas, and a narrowly scoped Robinhood equities activity
-adapter are complete. Execution promotion, position and trade reconstruction, options strategy
-detection, and profit-and-loss calculations have not yet been implemented.
+The repository foundation, canonical schemas, a narrowly scoped Robinhood equities activity
+adapter, and deterministic long-equity FIFO reconstruction are complete. Execution promotion,
+short selling, options reconstruction, and strategy detection have not yet been implemented.
 
 ## Goals
 
@@ -59,6 +59,10 @@ pnpm check
 ## Current Scope
 
 Repository tooling, package boundaries, canonical instruments, broker activities, executions,
-trades, fees, and diagnostics are defined and runtime-validated. The Robinhood adapter can parse the
-observed synthetic equities activity format into `BrokerActivity`; IBKR, Webull, execution
-promotion, and all reconstruction behavior remain future work.
+trades, fees, and diagnostics are defined and runtime-validated. The Robinhood adapter parses the
+observed synthetic equities activity format into `BrokerActivity`. The public core API
+`reconstructEquityPositions` reconstructs long-equity FIFO lots, matches, position lifecycles,
+known fees, and realized P&L without promoting date-only activity to `Execution`.
+
+IBKR, Webull, execution promotion, short selling, options reconstruction, strategy detection, and
+useful CLI commands remain future work.
