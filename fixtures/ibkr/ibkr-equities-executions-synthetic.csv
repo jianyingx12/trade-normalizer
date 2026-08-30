@@ -1,0 +1,5 @@
+"ClientAccountID","CurrencyPrimary","AssetClass","Symbol","Description","Conid","UnderlyingSymbol","Multiplier","Strike","Expiry","Put/Call","Date/Time","Exchange","Buy/Sell","Quantity","Price","TradeID","ExecID","OrigTradeID","OrderID","OrderReference","IsAPIOrder","Commission","CommissionCurrency"
+"DU-SYNTHETIC-001","USD","STK","AAPL","APPLE INC","100001","","","","","","20260803;093015","NASDAQ","BUY","10","205.12","T-1001","E-1001","","O-5001","opening-buy","Y","-1.00","USD"
+"DU-SYNTHETIC-001","USD","STK","MSFT","MICROSOFT CORP","100002","","","","","","20260804;101500","NASDAQ","BUY","5","521.35","T-1002","E-1002","","O-5002","partial-entry","N","-0.50","USD"
+"DU-SYNTHETIC-001","USD","STK","MSFT","MICROSOFT CORP","100002","","","","","","20260804;101501","ARCA","BUY","3","521.40","T-1003","E-1003","","O-5002","partial-entry","N","-0.30","USD"
+"DU-SYNTHETIC-001","USD","STK","AAPL","APPLE INC","100001","","","","","","20260810;145930","NASDAQ","SELL","-4","216.25","T-1004","E-1004","T-0999","O-5003","partial-exit","Y","-0.75","USD"

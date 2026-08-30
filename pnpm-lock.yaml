@@ -41,6 +41,9 @@ importers:
       '@trade-normalizer/core':
         specifier: workspace:*
         version: link:../../core
+      csv-parse:
+        specifier: ^7.0.2
+        version: 7.0.2
 
   packages/adapters/robinhood:
     dependencies:
