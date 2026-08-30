@@ -5,7 +5,9 @@ broker-specific trade exports into a deterministic canonical format.
 
 The repository foundation, canonical schemas, a narrowly scoped Robinhood equities activity
 adapter, and deterministic long-equity FIFO reconstruction are complete. Execution promotion,
-short selling, options reconstruction, and strategy detection have not yet been implemented.
+short selling, option position reconstruction, and strategy detection have not yet been
+implemented. The core package includes broker-agnostic OCC option-symbol parsing and canonical
+option-contract identity utilities; no broker option export format is implemented yet.
 
 ## Goals
 
@@ -64,5 +66,10 @@ observed synthetic equities activity format into `BrokerActivity`. The public co
 `reconstructEquityPositions` reconstructs long-equity FIFO lots, matches, position lifecycles,
 known fees, and realized P&L without promoting date-only activity to `Execution`.
 
-IBKR, Webull, execution promotion, short selling, options reconstruction, strategy detection, and
-useful CLI commands remain future work.
+The core package can also parse standard compact or root-padded OCC/OSI equity option symbols into
+canonical option instruments and create deterministic contract keys from their complete identity.
+These utilities are broker-independent and are not evidence that any adapter supports option CSV
+rows.
+
+IBKR, Webull, execution promotion, short selling, option position reconstruction, strategy
+detection, broker-specific option parsing, and useful CLI commands remain future work.

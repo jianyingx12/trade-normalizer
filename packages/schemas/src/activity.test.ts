@@ -51,6 +51,71 @@ describe('broker activity schema', () => {
     expect(activity.timestamp).toBe('2026-08-03T14:31:00.000Z');
   });
 
+  it('validates date-only option trade activity without inventing fees or a timestamp', () => {
+    const activity = brokerActivitySchema.parse({
+      id: 'activity_option_date',
+      broker: 'test-broker',
+      activityType: 'trade',
+      instrument: {
+        assetType: 'option',
+        underlying: 'AAPL',
+        expiration: '2026-09-18',
+        strike: '200',
+        optionType: 'call',
+        multiplier: 100,
+      },
+      activityDate: '2026-08-03',
+      timestampPrecision: 'date',
+      side: 'buy',
+      quantity: '2',
+      price: '4.25',
+      provenance: { sourceIndex: 0 },
+    });
+
+    expect(activity.instrument?.assetType).toBe('option');
+    expect(activity.quantity?.equals(2)).toBe(true);
+    expect(activity.price?.equals('4.25')).toBe(true);
+    expect(activity.timestamp).toBeUndefined();
+    expect(activity.fees).toBeUndefined();
+  });
+
+  it('validates datetime option trade activity with an explicit multiplier and fees', () => {
+    const activity = brokerActivitySchema.parse({
+      id: 'activity_option_datetime',
+      broker: 'test-broker',
+      activityType: 'trade',
+      instrument: {
+        assetType: 'option',
+        underlying: 'AAPL',
+        expiration: '2026-09-18',
+        strike: '17.5',
+        optionType: 'put',
+        multiplier: 10,
+      },
+      activityDate: '2026-08-03',
+      timestamp: '2026-08-03T14:31:00.000Z',
+      timestampPrecision: 'datetime',
+      side: 'sell',
+      quantity: '1',
+      price: '2.10',
+      fees: {
+        commission: '0.50',
+        regulatory: '0',
+        contract: '0.10',
+        other: '0',
+        total: '0.60',
+      },
+      provenance: { sourceIndex: 0 },
+    });
+
+    expect(activity.instrument).toMatchObject({
+      assetType: 'option',
+      multiplier: 10,
+      optionType: 'put',
+    });
+    expect(activity.fees?.total.equals('0.60')).toBe(true);
+  });
+
   it('validates dividend activity without execution-only fields', () => {
     const activity = brokerActivitySchema.parse({
       id: 'activity_003',
