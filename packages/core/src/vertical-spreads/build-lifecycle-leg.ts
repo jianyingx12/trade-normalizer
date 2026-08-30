@@ -22,9 +22,9 @@ function allocateMatch(match: OptionLotMatch, quantity: Decimal): VerticalSpread
       ? undefined
       : proportional(match.openingFees.plus(match.closingFees), quantity, match.matchedQuantity);
   const netRealizedPnl =
-    match.netRealizedPnl === undefined
+    match.netRealizedPnl === undefined || realizedFees === undefined
       ? undefined
-      : proportional(match.netRealizedPnl, quantity, match.matchedQuantity);
+      : grossRealizedPnl.minus(realizedFees);
 
   return {
     matchId: match.id,
