@@ -92,6 +92,15 @@ export interface VerticalSpreadOwnershipResult {
   readonly diagnostics: readonly Diagnostic[];
 }
 
+export type VerticalSpreadReconstructionOptions = VerticalSpreadCandidateOptions;
+
+export interface VerticalSpreadReconstructionResult {
+  readonly spreads: readonly VerticalSpreadLifecycle[];
+  /** Opening-lot ownership not assigned to a reconstructed spread; zero remainders are omitted. */
+  readonly ungrouped: readonly OptionLotOwnership[];
+  readonly diagnostics: readonly Diagnostic[];
+}
+
 export type VerticalSpreadLifecycleStatus = 'open' | 'partially_closed' | 'closed';
 
 /** A quantity-proportional reference to accounting already performed by Phase 6. */

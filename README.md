@@ -5,8 +5,9 @@ broker-specific trade exports into a deterministic canonical format.
 
 The repository foundation, canonical schemas, a narrowly scoped Robinhood equities activity
 adapter, deterministic long-equity FIFO reconstruction, and deterministic single-contract option
-FIFO reconstruction are complete. Execution promotion, multi-leg option grouping, and strategy
-detection have not yet been implemented. No broker option export format is implemented yet.
+FIFO reconstruction are complete. The core also reconstructs ambiguity-safe two-leg vertical
+spread lifecycles from canonical option results. Execution promotion and canonical Trade
+production have not yet been implemented. No broker option export format is implemented yet.
 
 ## Goals
 
@@ -72,8 +73,14 @@ rows.
 
 `reconstructOptionPositions` reconstructs independent canonical option contracts as flat, long, or
 short FIFO positions. It calculates multiplier-aware premiums and P&L, allocates known monetary
-fees, rejects zero-crossing reversals atomically, and emits contract-direction lifecycles. It does
-not group contracts into spreads or other strategies.
+fees, rejects zero-crossing reversals atomically, and emits contract-direction lifecycles.
 
-IBKR, Webull, execution promotion, multi-leg option grouping, strategy detection, broker-specific
-option parsing, exercise/assignment/expiration, and useful CLI commands remain future work.
+`reconstructVerticalSpreads` consumes that contract reconstruction and infers only bull/bear call
+and put verticals with confirmed datetime correlation. It allocates quantities conservatively,
+preserves partial or ambiguous ownership as ungrouped, and aggregates spread cash flow and realized
+P&L from the existing contract matches. Structural inference does not claim broker-confirmed order
+intent.
+
+IBKR, Webull, execution promotion, strategies beyond vertical spreads, canonical Trade promotion,
+broker-specific option parsing, exercise/assignment/expiration, and useful CLI commands remain
+future work.

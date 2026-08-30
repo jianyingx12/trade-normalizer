@@ -16,6 +16,17 @@ export {
   parseOccOptionSymbol,
   sameOptionInstrument,
 } from './option-instruments/index.js';
+export { reconstructVerticalSpreads } from './vertical-spreads/reconstruct-vertical-spreads.js';
+export type {
+  OptionLotOwnership,
+  VerticalSpreadLifecycle,
+  VerticalSpreadLifecycleLeg,
+  VerticalSpreadLifecycleStatus,
+  VerticalSpreadMatchAllocation,
+  VerticalSpreadReconstructionOptions,
+  VerticalSpreadReconstructionResult,
+  VerticalSpreadStrategy,
+} from './vertical-spreads/types.js';
 export { reconstructOptionPositions } from './option-reconstruction/reconstruct-option-positions.js';
 export type {
   OptionLot,

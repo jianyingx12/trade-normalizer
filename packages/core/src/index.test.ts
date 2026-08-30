@@ -5,9 +5,11 @@ import {
   parseOccOptionSymbol,
   reconstructEquityPositions,
   reconstructOptionPositions,
+  reconstructVerticalSpreads,
   sameOptionInstrument,
   type BrokerAdapterDescriptor,
   type OptionInstrumentKey,
+  type VerticalSpreadReconstructionResult,
 } from './index.js';
 
 describe('@trade-normalizer/core', () => {
@@ -44,5 +46,15 @@ describe('@trade-normalizer/core', () => {
     expectTypeOf<ReturnType<typeof reconstructOptionPositions>>().toHaveProperty('matches');
     expectTypeOf<ReturnType<typeof reconstructOptionPositions>>().toHaveProperty('lifecycles');
     expectTypeOf<ReturnType<typeof reconstructOptionPositions>>().toHaveProperty('diagnostics');
+  });
+
+  it('publishes the high-level vertical spread reconstruction API', () => {
+    expectTypeOf(reconstructVerticalSpreads).toBeFunction();
+    expectTypeOf<
+      ReturnType<typeof reconstructVerticalSpreads>
+    >().toEqualTypeOf<VerticalSpreadReconstructionResult>();
+    expectTypeOf<ReturnType<typeof reconstructVerticalSpreads>>().toHaveProperty('spreads');
+    expectTypeOf<ReturnType<typeof reconstructVerticalSpreads>>().toHaveProperty('ungrouped');
+    expectTypeOf<ReturnType<typeof reconstructVerticalSpreads>>().toHaveProperty('diagnostics');
   });
 });

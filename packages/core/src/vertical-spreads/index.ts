@@ -5,6 +5,7 @@ export {
   DEFAULT_DATETIME_GROUPING_WINDOW_MS,
   generateVerticalSpreadCandidates,
 } from './generate-candidates.js';
+export { reconstructVerticalSpreads } from './reconstruct-vertical-spreads.js';
 export type {
   OptionLotOwnership,
   VerticalSpreadCandidate,
@@ -18,5 +19,7 @@ export type {
   VerticalSpreadMatchAllocation,
   VerticalSpreadOwnershipAllocation,
   VerticalSpreadOwnershipResult,
+  VerticalSpreadReconstructionOptions,
+  VerticalSpreadReconstructionResult,
   VerticalSpreadStrategy,
 } from './types.js';
