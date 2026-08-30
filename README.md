@@ -42,6 +42,7 @@ packages/
 
 ```bash
 pnpm install
+pnpm build
 pnpm check
 ```
 
@@ -50,6 +51,7 @@ pnpm check
 | Command             | Purpose                                                   |
 | ------------------- | --------------------------------------------------------- |
 | `pnpm build`        | Build all TypeScript projects using project references    |
+| `pnpm cli`          | Run the compiled CLI after `pnpm build`                   |
 | `pnpm clean`        | Remove TypeScript project build outputs                   |
 | `pnpm typecheck`    | Type-check the complete workspace without emitting files  |
 | `pnpm test`         | Run the Vitest suite once                                 |
@@ -58,6 +60,56 @@ pnpm check
 | `pnpm format`       | Format supported files with Prettier                      |
 | `pnpm format:check` | Verify formatting without changing files                  |
 | `pnpm check`        | Run formatting, linting, type-checking, tests, and builds |
+
+## CLI Usage
+
+Build the workspace before using the development CLI:
+
+```bash
+pnpm build
+pnpm cli normalize trades.csv --broker robinhood
+pnpm cli inspect trades.csv --broker robinhood
+pnpm cli validate trades.csv --broker robinhood
+```
+
+The installed-package command has the same interface:
+
+```bash
+trade-normalizer normalize trades.csv --broker robinhood
+trade-normalizer normalize trades.csv --broker robinhood --output normalized.json
+trade-normalizer inspect trades.csv --broker robinhood
+trade-normalizer inspect trades.csv --broker robinhood --json
+trade-normalizer validate trades.csv --broker robinhood
+```
+
+`normalize` writes a deterministic JSON envelope to stdout unless `--output` is provided. The
+envelope has `schemaVersion: "1"`, source and summary information, canonical logical Trades, and
+diagnostics. Decimal quantities and financial values are JSON strings. Date-only input stays
+date-only, and missing fees and net P&L remain absent rather than becoming zero.
+
+`inspect` reports adaptation facts without reconstructing positions or Trades. `validate` checks
+UTF-8 file readability, broker compatibility, CSV structure, and canonical activity normalization.
+Warnings are considered usable validation results; error diagnostics fail validation.
+
+Exit codes are stable:
+
+| Code | Meaning                                                          |
+| ---- | ---------------------------------------------------------------- |
+| `0`  | Command completed, including usable results containing warnings  |
+| `1`  | File, broker, parsing, normalization, validation, or write error |
+| `2`  | Invalid command-line usage                                       |
+
+Successful normalization emits no logs or ANSI formatting into stdout JSON. Fatal operational
+errors go to stderr and do not emit partial JSON. Output files are completely serialized before an
+atomic replacement, and the CLI refuses to overwrite its own input CSV.
+
+The CLI runs locally. It does not upload broker data, send telemetry, call external APIs, request
+market data, or use OpenAI services.
+
+Current broker-file support is limited to the observed Robinhood equities activity format and its
+documented transaction codes. Robinhood option rows, IBKR, and Webull are not implemented. The
+engine can produce `equity_long`, long/short call and put, and four vertical-spread Trade types when
+canonical activities are supplied, but the current CLI broker adapter produces equities only.
 
 ## Current Scope
 
@@ -88,4 +140,4 @@ upstream diagnostics, and returns structured `unpromoted` records when inconsist
 an isolated promotion failure makes a Trade unsafe to produce.
 
 IBKR, Webull, execution promotion, strategies beyond vertical spreads, broker-specific option
-parsing, exercise/assignment/expiration, and useful CLI commands remain future work.
+parsing, and exercise/assignment/expiration remain future work.

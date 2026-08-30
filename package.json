@@ -11,6 +11,7 @@
   },
   "scripts": {
     "build": "tsc -b",
+    "cli": "node packages/cli/dist/index.js",
     "clean": "tsc -b --clean",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

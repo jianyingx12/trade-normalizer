@@ -4,7 +4,7 @@ import { join, resolve } from 'node:path';
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { InputOverwriteError } from '../errors/operational-error.js';
+import { InputOverwriteError, OutputFileError } from '../errors/operational-error.js';
 import { runNormalizeCommand, type NormalizeCommandIo } from './normalize.js';
 
 const fixturePath = resolve('fixtures/robinhood/robinhood-equities-synthetic.csv');
@@ -76,5 +76,13 @@ describe('runNormalizeCommand', () => {
       runNormalizeCommand(copiedInput, { broker: 'robinhood', output: copiedInput }),
     ).rejects.toBeInstanceOf(InputOverwriteError);
     expect(await readFile(copiedInput, 'utf8')).toBe(before);
+  });
+
+  it('reports output filesystem failures without leaving partial JSON', async () => {
+    const outputFile = join(temporaryDirectory, 'missing-directory', 'normalized.json');
+
+    await expect(
+      runNormalizeCommand(copiedInput, { broker: 'robinhood', output: outputFile }),
+    ).rejects.toBeInstanceOf(OutputFileError);
   });
 });
