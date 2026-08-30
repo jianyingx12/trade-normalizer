@@ -4,10 +4,9 @@ Universal Trade Normalizer is an open-source TypeScript library and CLI for conv
 broker-specific trade exports into a deterministic canonical format.
 
 The repository foundation, canonical schemas, a narrowly scoped Robinhood equities activity
-adapter, and deterministic long-equity FIFO reconstruction are complete. Execution promotion,
-short selling, option position reconstruction, and strategy detection have not yet been
-implemented. The core package includes broker-agnostic OCC option-symbol parsing and canonical
-option-contract identity utilities; no broker option export format is implemented yet.
+adapter, deterministic long-equity FIFO reconstruction, and deterministic single-contract option
+FIFO reconstruction are complete. Execution promotion, multi-leg option grouping, and strategy
+detection have not yet been implemented. No broker option export format is implemented yet.
 
 ## Goals
 
@@ -71,5 +70,10 @@ canonical option instruments and create deterministic contract keys from their c
 These utilities are broker-independent and are not evidence that any adapter supports option CSV
 rows.
 
-IBKR, Webull, execution promotion, short selling, option position reconstruction, strategy
-detection, broker-specific option parsing, and useful CLI commands remain future work.
+`reconstructOptionPositions` reconstructs independent canonical option contracts as flat, long, or
+short FIFO positions. It calculates multiplier-aware premiums and P&L, allocates known monetary
+fees, rejects zero-crossing reversals atomically, and emits contract-direction lifecycles. It does
+not group contracts into spreads or other strategies.
+
+IBKR, Webull, execution promotion, multi-leg option grouping, strategy detection, broker-specific
+option parsing, exercise/assignment/expiration, and useful CLI commands remain future work.

@@ -112,3 +112,8 @@ export interface OptionReplayResult {
   readonly lifecycles: readonly OptionPositionLifecycle[];
   readonly diagnostics: readonly Diagnostic[];
 }
+
+/** Public result returned after option eligibility, ordering, and directional FIFO replay. */
+export interface OptionReconstructionResult extends OptionReplayResult {
+  readonly openLots: readonly OptionLot[];
+}

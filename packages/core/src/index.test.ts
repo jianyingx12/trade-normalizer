@@ -4,6 +4,7 @@ import {
   createOptionInstrumentKey,
   parseOccOptionSymbol,
   reconstructEquityPositions,
+  reconstructOptionPositions,
   sameOptionInstrument,
   type BrokerAdapterDescriptor,
   type OptionInstrumentKey,
@@ -34,5 +35,14 @@ describe('@trade-normalizer/core', () => {
   it('publishes the OCC option symbol parser', () => {
     expectTypeOf(parseOccOptionSymbol).toBeFunction();
     expectTypeOf<ReturnType<typeof parseOccOptionSymbol>>().toHaveProperty('success');
+  });
+
+  it('publishes the high-level option reconstruction API', () => {
+    expectTypeOf(reconstructOptionPositions).toBeFunction();
+    expectTypeOf<ReturnType<typeof reconstructOptionPositions>>().toHaveProperty('positions');
+    expectTypeOf<ReturnType<typeof reconstructOptionPositions>>().toHaveProperty('openLots');
+    expectTypeOf<ReturnType<typeof reconstructOptionPositions>>().toHaveProperty('matches');
+    expectTypeOf<ReturnType<typeof reconstructOptionPositions>>().toHaveProperty('lifecycles');
+    expectTypeOf<ReturnType<typeof reconstructOptionPositions>>().toHaveProperty('diagnostics');
   });
 });

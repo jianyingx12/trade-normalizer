@@ -16,6 +16,17 @@ export {
   parseOccOptionSymbol,
   sameOptionInstrument,
 } from './option-instruments/index.js';
+export { reconstructOptionPositions } from './option-reconstruction/reconstruct-option-positions.js';
+export type {
+  OptionLot,
+  OptionLotMatch,
+  OptionPositionDirection,
+  OptionPositionKey,
+  OptionPositionLifecycle,
+  OptionPositionState,
+  OptionPositionStatus,
+  OptionReconstructionResult,
+} from './option-reconstruction/types.js';
 export type {
   OccOptionSymbolParseError,
   OccOptionSymbolParseErrorReason,
