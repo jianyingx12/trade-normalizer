@@ -24,6 +24,8 @@ interface MutableEquityLot {
   readonly instrument: EquityLot['instrument'];
   readonly openingActivityId: string;
   readonly openedOn: string;
+  readonly openedAt: string | undefined;
+  readonly timestampPrecision: EquityLot['timestampPrecision'];
   readonly originalQuantity: Decimal;
   remainingQuantity: Decimal;
   readonly entryPrice: Decimal;
@@ -104,6 +106,8 @@ function addBuy(
     instrument: activity.instrument,
     openingActivityId: activity.id,
     openedOn: activity.activityDate,
+    openedAt: activity.timestamp,
+    timestampPrecision: activity.timestampPrecision,
     originalQuantity: activity.quantity,
     remainingQuantity: activity.quantity,
     entryPrice: activity.price,
@@ -154,6 +158,10 @@ function applySell(
       instrument: activity.instrument,
       openingActivityId: lot.openingActivityId,
       closingActivityId: activity.id,
+      closedOn: activity.activityDate,
+      ...(activity.timestamp === undefined ? {} : { closedAt: activity.timestamp }),
+      closingTimestampPrecision: activity.timestampPrecision,
+      closingSourceIndex: activity.provenance.sourceIndex,
       matchedQuantity,
       entryPrice: lot.entryPrice,
       exitPrice: activity.price,
@@ -202,6 +210,8 @@ function snapshot(position: MutablePositionState): EquityPositionState {
     instrument: lot.instrument,
     openingActivityId: lot.openingActivityId,
     openedOn: lot.openedOn,
+    ...(lot.openedAt === undefined ? {} : { openedAt: lot.openedAt }),
+    timestampPrecision: lot.timestampPrecision,
     originalQuantity: lot.originalQuantity,
     remainingQuantity: lot.remainingQuantity,
     entryPrice: lot.entryPrice,

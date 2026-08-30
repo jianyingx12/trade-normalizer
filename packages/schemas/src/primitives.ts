@@ -16,7 +16,8 @@ export const assetTypeSchema = z.enum(['equity', 'option']);
 export const executionSideSchema = z.enum(['buy', 'sell']);
 export const positionEffectSchema = z.enum(['open', 'close', 'unknown']);
 export const optionTypeSchema = z.enum(['call', 'put']);
-export const tradeStatusSchema = z.enum(['open', 'closed']);
+export const timestampPrecisionSchema = z.enum(['date', 'datetime']);
+export const tradeStatusSchema = z.enum(['open', 'partially_closed', 'closed']);
 export const tradeLegDirectionSchema = z.enum(['long', 'short']);
 
 export const strategyTypeSchema = z.enum([
@@ -72,6 +73,7 @@ export type AssetType = z.infer<typeof assetTypeSchema>;
 export type ExecutionSide = z.infer<typeof executionSideSchema>;
 export type PositionEffect = z.infer<typeof positionEffectSchema>;
 export type OptionType = z.infer<typeof optionTypeSchema>;
+export type TimestampPrecision = z.infer<typeof timestampPrecisionSchema>;
 export type TradeStatus = z.infer<typeof tradeStatusSchema>;
 export type TradeLegDirection = z.infer<typeof tradeLegDirectionSchema>;
 export type StrategyType = z.infer<typeof strategyTypeSchema>;

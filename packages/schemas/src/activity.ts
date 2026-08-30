@@ -11,6 +11,7 @@ import {
   isoUtcTimestampSchema,
   nonNegativeDecimalSchema,
   positiveDecimalSchema,
+  timestampPrecisionSchema,
 } from './primitives.js';
 import { sourceProvenanceSchema } from './provenance.js';
 
@@ -23,8 +24,6 @@ export const brokerActivityTypeSchema = z.enum([
   'split',
   'unknown',
 ]);
-
-export const timestampPrecisionSchema = z.enum(['date', 'datetime']);
 
 export const brokerActivitySchema = z
   .object({
@@ -63,6 +62,5 @@ export const brokerActivitySchema = z
   });
 
 export type BrokerActivityType = z.infer<typeof brokerActivityTypeSchema>;
-export type TimestampPrecision = z.infer<typeof timestampPrecisionSchema>;
 export type BrokerActivity = z.output<typeof brokerActivitySchema>;
 export type BrokerActivityInput = z.input<typeof brokerActivitySchema>;

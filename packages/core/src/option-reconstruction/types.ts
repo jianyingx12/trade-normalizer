@@ -82,7 +82,7 @@ export interface OptionPositionLifecycle {
   readonly key: OptionPositionKey;
   readonly instrument: OptionInstrument;
   readonly direction: OptionPositionDirection;
-  readonly status: TradeStatus;
+  readonly status: Extract<TradeStatus, 'open' | 'closed'>;
   readonly openingActivityId: string;
   readonly closingActivityId?: string;
   readonly openedOn: string;
