@@ -2,8 +2,13 @@ import type {
   BrokerActivity,
   Diagnostic,
   ExecutionSide,
+  FeeBreakdown,
   OptionInstrument,
+  SourceProvenance,
 } from '@trade-normalizer/schemas';
+import type { Decimal } from 'decimal.js';
+
+import type { OptionInstrumentKey } from '../option-instruments/index.js';
 
 /** A canonical activity with every fact required by option position reconstruction. */
 export interface EligibleOptionTradeActivity extends BrokerActivity {
@@ -16,5 +21,63 @@ export interface EligibleOptionTradeActivity extends BrokerActivity {
 
 export interface PreparedOptionActivities {
   readonly activities: readonly EligibleOptionTradeActivity[];
+  readonly diagnostics: readonly Diagnostic[];
+}
+
+export type OptionPositionDirection = 'long' | 'short';
+export type OptionPositionStatus = 'flat' | OptionPositionDirection;
+
+export interface OptionPositionKey {
+  readonly broker: BrokerActivity['broker'];
+  readonly accountId?: string;
+  readonly contractKey: OptionInstrumentKey;
+}
+
+/** One direction-opening option activity preserved as a distinct FIFO lot. */
+export interface OptionLot {
+  readonly id: string;
+  readonly instrument: OptionInstrument;
+  readonly direction: OptionPositionDirection;
+  readonly openingActivityId: string;
+  readonly openedOn: string;
+  readonly originalQuantity: Decimal;
+  readonly remainingQuantity: Decimal;
+  readonly entryPrice: Decimal;
+  readonly openingFees?: FeeBreakdown;
+  readonly provenance: SourceProvenance;
+}
+
+/** The portion of one closing activity assigned to one older option lot. */
+export interface OptionLotMatch {
+  readonly id: string;
+  readonly instrument: OptionInstrument;
+  readonly direction: OptionPositionDirection;
+  readonly openingActivityId: string;
+  readonly closingActivityId: string;
+  readonly matchedQuantity: Decimal;
+  readonly entryPrice: Decimal;
+  readonly exitPrice: Decimal;
+  /** Paid for long lots and received for short lots. */
+  readonly openingPremium: Decimal;
+  /** Received for long lots and paid for short lots. */
+  readonly closingPremium: Decimal;
+  readonly grossRealizedPnl: Decimal;
+}
+
+export interface OptionPositionState {
+  readonly key: OptionPositionKey;
+  readonly instrument: OptionInstrument;
+  readonly status: OptionPositionStatus;
+  readonly openQuantity: Decimal;
+  /** Remaining premium basis; paid when long and received when short. */
+  readonly remainingOpeningPremium: Decimal;
+  readonly grossRealizedPnl: Decimal;
+  readonly lots: readonly OptionLot[];
+  readonly matches: readonly OptionLotMatch[];
+}
+
+export interface OptionReplayResult {
+  readonly positions: readonly OptionPositionState[];
+  readonly matches: readonly OptionLotMatch[];
   readonly diagnostics: readonly Diagnostic[];
 }

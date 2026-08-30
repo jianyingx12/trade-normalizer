@@ -24,6 +24,7 @@ export const diagnosticCodeSchema = z.enum([
   'INCOMPLETE_TRADE_ACTIVITY',
   'UNSUPPORTED_ASSET_TYPE',
   'SELL_WITHOUT_OPEN_POSITION',
+  'OPTION_POSITION_REVERSAL_NOT_SUPPORTED',
 ]);
 
 const diagnosticContextShape = {
