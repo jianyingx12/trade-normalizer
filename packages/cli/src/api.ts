@@ -38,3 +38,5 @@ export {
 } from './output/types.js';
 export { serializeJson, type JsonValue } from './serialization/serialize-json.js';
 export type { InspectionReport } from './output/inspection.js';
+export { createProgram, runCli } from './program.js';
+export { type CliRuntime } from './runtime.js';

@@ -1,0 +1,195 @@
+{
+  "schemaVersion": "1",
+  "source": {
+    "broker": "robinhood",
+    "file": "robinhood-equities-synthetic.csv"
+  },
+  "summary": {
+    "sourceRecords": 17,
+    "activities": 17,
+    "trades": 4,
+    "diagnostics": 0,
+    "activityTypes": {
+      "trade": 13,
+      "dividend": 1,
+      "deposit": 1,
+      "withdrawal": 0,
+      "fee": 1,
+      "split": 1,
+      "unknown": 0
+    },
+    "assetTypes": {
+      "equity": 15,
+      "option": 0,
+      "unspecified": 2
+    }
+  },
+  "trades": [
+    {
+      "id": "trade:v1:166c0748929d7d443dbe9636dbfba8d8b692f723fa07eb0e00cea011f35ab6b4",
+      "broker": "robinhood",
+      "underlying": "AAPL",
+      "assetType": "equity",
+      "strategy": "equity_long",
+      "status": "closed",
+      "opened": {
+        "date": "2026-08-03",
+        "precision": "date"
+      },
+      "closed": {
+        "date": "2026-08-20",
+        "precision": "date"
+      },
+      "legs": [
+        {
+          "id": "trade-leg:v1:c58c0cd6153fa7c86edfbdfca93ebd3129ae6e86c2cfe5b92a3018256cedbeec",
+          "instrument": {
+            "assetType": "equity",
+            "symbol": "AAPL"
+          },
+          "direction": "long",
+          "quantity": "15",
+          "openQuantity": "0",
+          "lifecycleIds": [
+            "lifecycle:robinhood:activity:robinhood%3Arobinhood-equities-synthetic.csv:0"
+          ],
+          "openingActivityIds": [
+            "robinhood:activity:robinhood%3Arobinhood-equities-synthetic.csv:0",
+            "robinhood:activity:robinhood%3Arobinhood-equities-synthetic.csv:3"
+          ],
+          "closingActivityIds": [
+            "robinhood:activity:robinhood%3Arobinhood-equities-synthetic.csv:4",
+            "robinhood:activity:robinhood%3Arobinhood-equities-synthetic.csv:9"
+          ],
+          "executionIds": [],
+          "grossRealizedPnl": "163.7"
+        }
+      ],
+      "grossRealizedPnl": "163.7",
+      "warnings": []
+    },
+    {
+      "id": "trade:v1:2d5ed3839679070126bc5c86816bf2c663d0de4a154c8dfdce4c14cd453a1782",
+      "broker": "robinhood",
+      "underlying": "NVDA",
+      "assetType": "equity",
+      "strategy": "equity_long",
+      "status": "closed",
+      "opened": {
+        "date": "2026-08-07",
+        "precision": "date"
+      },
+      "closed": {
+        "date": "2026-08-24",
+        "precision": "date"
+      },
+      "legs": [
+        {
+          "id": "trade-leg:v1:8e593b24771ccb27cd32934d968b486ccbbc1692c82233f7905113ce11806d46",
+          "instrument": {
+            "assetType": "equity",
+            "symbol": "NVDA"
+          },
+          "direction": "long",
+          "quantity": "9",
+          "openQuantity": "0",
+          "lifecycleIds": [
+            "lifecycle:robinhood:activity:robinhood%3Arobinhood-equities-synthetic.csv:2"
+          ],
+          "openingActivityIds": [
+            "robinhood:activity:robinhood%3Arobinhood-equities-synthetic.csv:10",
+            "robinhood:activity:robinhood%3Arobinhood-equities-synthetic.csv:2"
+          ],
+          "closingActivityIds": [
+            "robinhood:activity:robinhood%3Arobinhood-equities-synthetic.csv:11",
+            "robinhood:activity:robinhood%3Arobinhood-equities-synthetic.csv:5"
+          ],
+          "executionIds": [],
+          "grossRealizedPnl": "73.95"
+        }
+      ],
+      "grossRealizedPnl": "73.95",
+      "warnings": []
+    },
+    {
+      "id": "trade:v1:e4eb180abb23c5579642abbf37e27f73d89089b2538abf04907f59002c0ace41",
+      "broker": "robinhood",
+      "underlying": "MSFT",
+      "assetType": "equity",
+      "strategy": "equity_long",
+      "status": "closed",
+      "opened": {
+        "date": "2026-08-05",
+        "precision": "date"
+      },
+      "closed": {
+        "date": "2026-08-25",
+        "precision": "date"
+      },
+      "legs": [
+        {
+          "id": "trade-leg:v1:9ed65f39ef45373bbbf02b4bea3b01c6ddc3113c8f9f0df5eb6089a5d9e9cd74",
+          "instrument": {
+            "assetType": "equity",
+            "symbol": "MSFT"
+          },
+          "direction": "long",
+          "quantity": "4",
+          "openQuantity": "0",
+          "lifecycleIds": [
+            "lifecycle:robinhood:activity:robinhood%3Arobinhood-equities-synthetic.csv:1"
+          ],
+          "openingActivityIds": [
+            "robinhood:activity:robinhood%3Arobinhood-equities-synthetic.csv:1"
+          ],
+          "closingActivityIds": [
+            "robinhood:activity:robinhood%3Arobinhood-equities-synthetic.csv:12",
+            "robinhood:activity:robinhood%3Arobinhood-equities-synthetic.csv:8"
+          ],
+          "executionIds": [],
+          "grossRealizedPnl": "43.45"
+        }
+      ],
+      "grossRealizedPnl": "43.45",
+      "warnings": []
+    },
+    {
+      "id": "trade:v1:f4ff418378b4befe196ddac186ffbf127026b593c1397cda560b78efb638bdf7",
+      "broker": "robinhood",
+      "underlying": "VOO",
+      "assetType": "equity",
+      "strategy": "equity_long",
+      "status": "partially_closed",
+      "opened": {
+        "date": "2026-08-17",
+        "precision": "date"
+      },
+      "legs": [
+        {
+          "id": "trade-leg:v1:f18cf2660fe72be68cd19c70c78ae45fefb07ccc70f2385815e16b13c4ac0ac0",
+          "instrument": {
+            "assetType": "equity",
+            "symbol": "VOO"
+          },
+          "direction": "long",
+          "quantity": "1.375",
+          "openQuantity": "0.875",
+          "lifecycleIds": [
+            "lifecycle:robinhood:activity:robinhood%3Arobinhood-equities-synthetic.csv:6"
+          ],
+          "openingActivityIds": [
+            "robinhood:activity:robinhood%3Arobinhood-equities-synthetic.csv:6"
+          ],
+          "closingActivityIds": [
+            "robinhood:activity:robinhood%3Arobinhood-equities-synthetic.csv:13"
+          ],
+          "executionIds": [],
+          "grossRealizedPnl": "2.85"
+        }
+      ],
+      "grossRealizedPnl": "2.85",
+      "warnings": []
+    }
+  ],
+  "diagnostics": []
+}

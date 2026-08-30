@@ -3,8 +3,8 @@ import { resolve } from 'node:path';
 import type { Command } from 'commander';
 
 import { InputOverwriteError } from '../errors/operational-error.js';
-import { writeUtf8FileAtomically } from '../io/write-utf8-file-atomically.js';
 import { normalizeBrokerFile } from '../orchestration/normalize-broker-source.js';
+import { processCliRuntime, type CliRuntime } from '../runtime.js';
 import { serializeJson } from '../serialization/serialize-json.js';
 
 export interface NormalizeCommandOptions {
@@ -12,15 +12,7 @@ export interface NormalizeCommandOptions {
   readonly output?: string;
 }
 
-export interface NormalizeCommandIo {
-  writeStdout(contents: string): void;
-  writeOutputFile(filePath: string, contents: string): Promise<void>;
-}
-
-const defaultIo: NormalizeCommandIo = {
-  writeStdout: (contents) => process.stdout.write(contents),
-  writeOutputFile: writeUtf8FileAtomically,
-};
+export type NormalizeCommandIo = Pick<CliRuntime, 'writeStdout' | 'writeOutputFile'>;
 
 function sameFile(left: string, right: string): boolean {
   const leftPath = resolve(left);
@@ -33,7 +25,7 @@ function sameFile(left: string, right: string): boolean {
 export async function runNormalizeCommand(
   inputFile: string,
   options: NormalizeCommandOptions,
-  io: NormalizeCommandIo = defaultIo,
+  io: NormalizeCommandIo = processCliRuntime,
 ): Promise<void> {
   if (options.output !== undefined && sameFile(inputFile, options.output)) {
     throw new InputOverwriteError(inputFile);
@@ -49,7 +41,10 @@ export async function runNormalizeCommand(
   await io.writeOutputFile(options.output, json);
 }
 
-export function registerNormalizeCommand(program: Command): void {
+export function registerNormalizeCommand(
+  program: Command,
+  runtime: CliRuntime = processCliRuntime,
+): void {
   program
     .command('normalize')
     .description('Normalize a supported broker CSV into canonical logical Trades')
@@ -57,6 +52,6 @@ export function registerNormalizeCommand(program: Command): void {
     .requiredOption('--broker <broker>', 'source broker (currently: robinhood)')
     .option('-o, --output <file>', 'write JSON to a file instead of stdout')
     .action((inputFile: string, options: NormalizeCommandOptions) =>
-      runNormalizeCommand(inputFile, options),
+      runNormalizeCommand(inputFile, options, runtime),
     );
 }

@@ -2,6 +2,7 @@ import type { Command } from 'commander';
 
 import { inspectBrokerFile } from '../orchestration/inspect-broker-source.js';
 import { formatInspection } from '../output/format-inspection.js';
+import { processCliRuntime, type CliRuntime } from '../runtime.js';
 import { serializeJson } from '../serialization/serialize-json.js';
 
 export interface InspectCommandOptions {
@@ -18,7 +19,10 @@ export async function runInspectCommand(
   writeStdout(options.json === true ? serializeJson(report) : formatInspection(report));
 }
 
-export function registerInspectCommand(program: Command): void {
+export function registerInspectCommand(
+  program: Command,
+  runtime: CliRuntime = processCliRuntime,
+): void {
   program
     .command('inspect')
     .description('Inspect broker source and adaptation results without reconstructing Trades')
@@ -26,6 +30,6 @@ export function registerInspectCommand(program: Command): void {
     .requiredOption('--broker <broker>', 'source broker (currently: robinhood)')
     .option('--json', 'write the inspection report as JSON')
     .action((inputFile: string, options: InspectCommandOptions) =>
-      runInspectCommand(inputFile, options),
+      runInspectCommand(inputFile, options, runtime.writeStdout),
     );
 }
