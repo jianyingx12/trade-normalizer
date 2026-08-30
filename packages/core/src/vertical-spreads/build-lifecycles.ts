@@ -86,6 +86,7 @@ function buildLifecycle(
 
   return {
     id: `vertical-lifecycle:${allocation.id}`,
+    candidateId: allocation.candidateId,
     strategy: allocation.strategy,
     broker: lowerStrikeLeg.positionKey.broker,
     ...(lowerStrikeLeg.positionKey.accountId === undefined

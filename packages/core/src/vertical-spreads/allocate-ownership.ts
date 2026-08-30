@@ -60,6 +60,7 @@ function allocateLeg(
     contractKey: leg.contractKey,
     lifecycleId: leg.lifecycleId,
     lotId: leg.lotId,
+    openingActivityId: leg.openingActivityId,
     instrument: leg.instrument,
     direction: leg.direction,
     quantity,

@@ -6,3 +6,4 @@ export {
 export type { TradeIdentityInput, TradeIdentityLegInput } from './identity.js';
 export { promoteEquityLifecycles } from './promote-equity-lifecycles.js';
 export { promoteSingleLegOptionTrades } from './promote-single-leg-options.js';
+export { promoteVerticalSpreadTrades } from './promote-vertical-spreads.js';

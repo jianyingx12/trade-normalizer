@@ -57,6 +57,7 @@ export interface VerticalSpreadLegAllocation {
   readonly contractKey: OptionInstrumentKey;
   readonly lifecycleId: OptionPositionLifecycle['id'];
   readonly lotId: OptionLot['id'];
+  readonly openingActivityId: OptionLot['openingActivityId'];
   readonly instrument: OptionInstrument;
   readonly direction: OptionPositionDirection;
   readonly quantity: Decimal;
@@ -135,6 +136,7 @@ export interface VerticalSpreadLifecycleLeg extends VerticalSpreadLegAllocation 
 /** A structural two-leg lifecycle; it does not claim broker-confirmed order intent. */
 export interface VerticalSpreadLifecycle {
   readonly id: string;
+  readonly candidateId: VerticalSpreadCandidate['id'];
   readonly strategy: VerticalSpreadStrategy;
   readonly broker: OptionPositionKey['broker'];
   readonly accountId?: string;

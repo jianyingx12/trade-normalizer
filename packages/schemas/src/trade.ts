@@ -54,7 +54,7 @@ export const strategyInferenceSchema = z
     level: z.enum(['confirmed', 'strong', 'inferred']),
     correlation: z.enum(['broker_order', 'datetime', 'source_order', 'structural']),
     openingTimeDistanceMs: z.number().int().nonnegative().optional(),
-    candidateId: canonicalIdSchema.optional(),
+    candidateId: z.string().trim().min(1).max(2048).optional(),
   })
   .strict();
 
