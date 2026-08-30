@@ -4,3 +4,4 @@ export {
   createCanonicalTradeLegId,
 } from './identity.js';
 export type { TradeIdentityInput, TradeIdentityLegInput } from './identity.js';
+export { promoteEquityLifecycles } from './promote-equity-lifecycles.js';
