@@ -7,6 +7,14 @@
   "files": [
     "dist"
   ],
+  "main": "./dist/api.js",
+  "types": "./dist/api.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/api.d.ts",
+      "import": "./dist/api.js"
+    }
+  },
   "bin": {
     "trade-normalizer": "./dist/index.js"
   },
@@ -15,6 +23,8 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "commander": "^15.0.0"
+    "@trade-normalizer/core": "workspace:*",
+    "commander": "^15.0.0",
+    "decimal.js": "^10.6.0"
   }
 }

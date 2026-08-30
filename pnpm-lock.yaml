@@ -59,9 +59,15 @@ importers:
 
   packages/cli:
     dependencies:
+      '@trade-normalizer/core':
+        specifier: workspace:*
+        version: link:../core
       commander:
         specifier: ^15.0.0
         version: 15.0.0
+      decimal.js:
+        specifier: ^10.6.0
+        version: 10.6.0
 
   packages/core:
     dependencies:
