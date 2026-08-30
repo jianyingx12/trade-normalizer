@@ -28,6 +28,8 @@ interface MutableOptionLot {
   readonly direction: OptionPositionDirection;
   readonly openingActivityId: string;
   readonly openedOn: string;
+  readonly openedAt: string | undefined;
+  readonly timestampPrecision: OptionLot['timestampPrecision'];
   readonly originalQuantity: Decimal;
   remainingQuantity: Decimal;
   readonly entryPrice: Decimal;
@@ -96,6 +98,8 @@ function addOpeningLot(
     direction: position.status === 'flat' ? openingDirection(activity) : position.status,
     openingActivityId: activity.id,
     openedOn: activity.activityDate,
+    openedAt: activity.timestamp,
+    timestampPrecision: activity.timestampPrecision,
     originalQuantity: activity.quantity,
     remainingQuantity: activity.quantity,
     entryPrice: activity.price,
@@ -199,6 +203,8 @@ function snapshot(position: MutableOptionPosition): OptionPositionState {
     direction: lot.direction,
     openingActivityId: lot.openingActivityId,
     openedOn: lot.openedOn,
+    ...(lot.openedAt === undefined ? {} : { openedAt: lot.openedAt }),
+    timestampPrecision: lot.timestampPrecision,
     originalQuantity: lot.originalQuantity,
     remainingQuantity: lot.remainingQuantity,
     entryPrice: lot.entryPrice,

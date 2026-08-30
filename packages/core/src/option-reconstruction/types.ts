@@ -42,6 +42,8 @@ export interface OptionLot {
   readonly direction: OptionPositionDirection;
   readonly openingActivityId: string;
   readonly openedOn: string;
+  readonly openedAt?: string;
+  readonly timestampPrecision: BrokerActivity['timestampPrecision'];
   readonly originalQuantity: Decimal;
   readonly remainingQuantity: Decimal;
   readonly entryPrice: Decimal;
@@ -80,7 +82,11 @@ export interface OptionPositionLifecycle {
   readonly openingActivityId: string;
   readonly closingActivityId?: string;
   readonly openedOn: string;
+  readonly openedAt?: string;
+  readonly openingTimestampPrecision: BrokerActivity['timestampPrecision'];
   readonly closedOn?: string;
+  readonly closedAt?: string;
+  readonly closingTimestampPrecision?: BrokerActivity['timestampPrecision'];
   readonly activityIds: readonly string[];
   readonly openQuantity: Decimal;
   readonly remainingOpeningPremium: Decimal;

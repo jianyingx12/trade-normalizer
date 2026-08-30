@@ -19,7 +19,11 @@ export interface MutableOptionLifecycle {
   readonly openingActivityId: string;
   closingActivityId: string | undefined;
   readonly openedOn: string;
+  readonly openedAt: string | undefined;
+  readonly openingTimestampPrecision: OptionPositionLifecycle['openingTimestampPrecision'];
   closedOn: string | undefined;
+  closedAt: string | undefined;
+  closingTimestampPrecision: OptionPositionLifecycle['closingTimestampPrecision'];
   readonly activityIds: string[];
 }
 
@@ -37,7 +41,11 @@ export function createOptionLifecycle(
     openingActivityId: activity.id,
     closingActivityId: undefined,
     openedOn: activity.activityDate,
+    openedAt: activity.timestamp,
+    openingTimestampPrecision: activity.timestampPrecision,
     closedOn: undefined,
+    closedAt: undefined,
+    closingTimestampPrecision: undefined,
     activityIds: [activity.id],
   };
 }
@@ -56,6 +64,8 @@ export function closeOptionLifecycle(
   lifecycle.status = 'closed';
   lifecycle.closingActivityId = activity.id;
   lifecycle.closedOn = activity.activityDate;
+  lifecycle.closedAt = activity.timestamp;
+  lifecycle.closingTimestampPrecision = activity.timestampPrecision;
 }
 
 export function snapshotOptionLifecycle(
@@ -101,7 +111,13 @@ export function snapshotOptionLifecycle(
       ? {}
       : { closingActivityId: lifecycle.closingActivityId }),
     openedOn: lifecycle.openedOn,
+    ...(lifecycle.openedAt === undefined ? {} : { openedAt: lifecycle.openedAt }),
+    openingTimestampPrecision: lifecycle.openingTimestampPrecision,
     ...(lifecycle.closedOn === undefined ? {} : { closedOn: lifecycle.closedOn }),
+    ...(lifecycle.closedAt === undefined ? {} : { closedAt: lifecycle.closedAt }),
+    ...(lifecycle.closingTimestampPrecision === undefined
+      ? {}
+      : { closingTimestampPrecision: lifecycle.closingTimestampPrecision }),
     activityIds: lifecycle.activityIds,
     openQuantity,
     remainingOpeningPremium,
