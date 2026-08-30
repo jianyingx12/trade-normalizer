@@ -2,6 +2,7 @@ import { describe, expectTypeOf, it } from 'vitest';
 
 import {
   createOptionInstrumentKey,
+  parseOccOptionSymbol,
   reconstructEquityPositions,
   sameOptionInstrument,
   type BrokerAdapterDescriptor,
@@ -28,5 +29,10 @@ describe('@trade-normalizer/core', () => {
     expectTypeOf(createOptionInstrumentKey).returns.toEqualTypeOf<OptionInstrumentKey>();
     expectTypeOf(sameOptionInstrument).toBeFunction();
     expectTypeOf(sameOptionInstrument).returns.toBeBoolean();
+  });
+
+  it('publishes the OCC option symbol parser', () => {
+    expectTypeOf(parseOccOptionSymbol).toBeFunction();
+    expectTypeOf<ReturnType<typeof parseOccOptionSymbol>>().toHaveProperty('success');
   });
 });

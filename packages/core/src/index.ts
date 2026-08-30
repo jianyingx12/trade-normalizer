@@ -9,5 +9,17 @@ export type {
   EquityPositionState,
   EquityReconstructionResult,
 } from './equity-reconstruction/types.js';
-export { createOptionInstrumentKey, sameOptionInstrument } from './option-instruments/index.js';
-export type { OptionInstrumentKey } from './option-instruments/index.js';
+export {
+  createOptionInstrumentKey,
+  OCC_OPTION_DEFAULT_MULTIPLIER,
+  OCC_OPTION_YEAR_CENTURY,
+  parseOccOptionSymbol,
+  sameOptionInstrument,
+} from './option-instruments/index.js';
+export type {
+  OccOptionSymbolParseError,
+  OccOptionSymbolParseErrorReason,
+  OccOptionSymbolParseResult,
+  OptionInstrumentKey,
+  ParseOccOptionSymbolOptions,
+} from './option-instruments/index.js';
