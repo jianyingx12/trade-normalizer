@@ -6,6 +6,7 @@ export type {
   OptionLotMatch,
   OptionPositionDirection,
   OptionPositionKey,
+  OptionPositionLifecycle,
   OptionPositionState,
   OptionPositionStatus,
   OptionReplayResult,

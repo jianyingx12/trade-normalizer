@@ -36,6 +36,16 @@ function instrument(override: Partial<OptionInstrumentInput> = {}): OptionInstru
   return { ...baseInstrument, ...override };
 }
 
+function fees(total: string): NonNullable<BrokerActivityInput['fees']> {
+  return {
+    commission: total,
+    regulatory: '0',
+    contract: '0',
+    other: '0',
+    total,
+  };
+}
+
 function prepared(overrides: readonly Partial<BrokerActivityInput>[]) {
   const activities = overrides.map((override, index) =>
     brokerActivitySchema.parse({
@@ -246,5 +256,96 @@ describe('replayOptionActivities', () => {
     expect(position.openQuantity.isZero()).toBe(true);
     expect(position.remainingOpeningPremium.isZero()).toBe(true);
     expect(position.status).toBe('flat');
+  });
+
+  it.each([
+    ['long', 'buy' as const, 'sell' as const, '4', '6'],
+    ['short', 'sell' as const, 'buy' as const, '6', '4'],
+  ])(
+    'allocates known fees and calculates %s net P&L',
+    (_direction, openSide, closeSide, entry, exit) => {
+      const result = replayOptionActivities(
+        prepared([
+          {
+            id: 'open',
+            side: openSide,
+            quantity: '3',
+            price: entry,
+            fees: fees('0.30'),
+          },
+          {
+            id: 'close',
+            side: closeSide,
+            quantity: '1',
+            price: exit,
+            fees: fees('0.10'),
+          },
+        ]),
+      );
+      const match = result.matches[0];
+      const position = result.positions[0];
+
+      expect(match?.openingFees?.toString()).toBe('0.1');
+      expect(match?.closingFees?.toString()).toBe('0.1');
+      expect(match?.grossRealizedPnl.toString()).toBe('200');
+      expect(match?.netRealizedPnl?.toString()).toBe('199.8');
+      expect(position?.remainingOpeningFees?.toString()).toBe('0.2');
+      expect(position?.netRealizedPnl?.toString()).toBe('199.8');
+    },
+  );
+
+  it('keeps net P&L unknown when either matched side has missing fees', () => {
+    const missingOpening = replayOptionActivities(
+      prepared([
+        { id: 'open', price: '4' },
+        { id: 'close', side: 'sell', price: '5', fees: fees('0') },
+      ]),
+    );
+    const missingClosing = replayOptionActivities(
+      prepared([
+        { id: 'open', price: '4', fees: fees('0') },
+        { id: 'close', side: 'sell', price: '5' },
+      ]),
+    );
+
+    expect(missingOpening.matches[0]?.netRealizedPnl).toBeUndefined();
+    expect(missingOpening.positions[0]?.netRealizedPnl).toBeUndefined();
+    expect(missingClosing.matches[0]?.netRealizedPnl).toBeUndefined();
+    expect(missingClosing.positions[0]?.netRealizedPnl).toBeUndefined();
+  });
+
+  it('distinguishes explicitly known zero fees from missing fees', () => {
+    const result = replayOptionActivities(
+      prepared([
+        { id: 'open', price: '4', fees: fees('0') },
+        { id: 'close', side: 'sell', price: '5', fees: fees('0') },
+      ]),
+    );
+
+    expect(result.matches[0]?.openingFees?.isZero()).toBe(true);
+    expect(result.matches[0]?.closingFees?.isZero()).toBe(true);
+    expect(result.matches[0]?.netRealizedPnl?.toString()).toBe('100');
+  });
+
+  it('conserves opening and closing fee totals across FIFO matches', () => {
+    const result = replayOptionActivities(
+      prepared([
+        { id: 'open-1', quantity: '1', fees: fees('0.10') },
+        { id: 'open-2', quantity: '2', fees: fees('0.20') },
+        { id: 'close', side: 'sell', quantity: '3', price: '5', fees: fees('0.17') },
+      ]),
+    );
+    const openingFees = result.matches.reduce(
+      (total, match) => total.plus(match.openingFees ?? 0),
+      new Decimal(0),
+    );
+    const closingFees = result.matches.reduce(
+      (total, match) => total.plus(match.closingFees ?? 0),
+      new Decimal(0),
+    );
+
+    expect(openingFees.toString()).toBe('0.3');
+    expect(closingFees.toString()).toBe('0.17');
+    expect(result.positions[0]?.remainingOpeningFees?.isZero()).toBe(true);
   });
 });
