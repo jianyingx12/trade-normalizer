@@ -1,0 +1,5 @@
+"ClientAccountID","CurrencyPrimary","AssetClass","Symbol","Description","Conid","UnderlyingSymbol","Multiplier","Strike","Expiry","Put/Call","Date/Time","Exchange","Buy/Sell","Quantity","Price","TradeID","ExecID","OrigTradeID","OrderID","OrderReference","IsAPIOrder","Commission","CommissionCurrency"
+"DU-EQUIVALENCE","USD","STK","AAPL","APPLE INC","100001","","","","","","20260803;093000","NASDAQ","BUY","10","100.00","T-EQ-1","E-EQ-1","","O-EQ-1","opening-buy","N","",""
+"DU-EQUIVALENCE","USD","STK","AAPL","APPLE INC","100001","","","","","","20260804;101500","NASDAQ","BUY","5","110.00","T-EQ-2","E-EQ-2","","O-EQ-2","second-buy","N","",""
+"DU-EQUIVALENCE","USD","STK","AAPL","APPLE INC","100001","","","","","","20260810;140000","NASDAQ","SELL","-6","120.00","T-EQ-3","E-EQ-3","","O-EQ-3","partial-sell","N","",""
+"DU-EQUIVALENCE","USD","STK","AAPL","APPLE INC","100001","","","","","","20260811;150000","NASDAQ","SELL","-9","125.00","T-EQ-4","E-EQ-4","","O-EQ-4","closing-sell","N","",""

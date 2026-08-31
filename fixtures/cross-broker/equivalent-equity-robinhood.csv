@@ -1,0 +1,5 @@
+"Activity Date","Process Date","Settle Date","Instrument","Description","Trans Code","Quantity","Price","Amount"
+"8/3/2026","8/3/2026","8/5/2026","AAPL","Synthetic opening buy","Buy","10","$100.00","($1,000.00)"
+"8/4/2026","8/4/2026","8/6/2026","AAPL","Synthetic second buy","Buy","5","$110.00","($550.00)"
+"8/10/2026","8/10/2026","8/12/2026","AAPL","Synthetic partial sell","Sell","6","$120.00","$720.00"
+"8/11/2026","8/11/2026","8/13/2026","AAPL","Synthetic closing sell","Sell","9","$125.00","$1,125.00"
