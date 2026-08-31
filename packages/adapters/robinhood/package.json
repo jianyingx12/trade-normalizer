@@ -1,9 +1,13 @@
 {
   "name": "@trade-normalizer/adapter-robinhood",
   "version": "0.0.0",
-  "description": "Robinhood adapter for Trade Normalizer",
+  "description": "Robinhood equity account-activity adapter for Trade Normalizer",
   "license": "MIT",
   "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22"
+  },
   "files": [
     "dist"
   ],

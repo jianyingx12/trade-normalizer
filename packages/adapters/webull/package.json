@@ -1,9 +1,14 @@
 {
   "name": "@trade-normalizer/adapter-webull",
   "version": "0.0.0",
-  "description": "Webull adapter for Trade Normalizer",
+  "private": true,
+  "description": "Reserved, unimplemented Webull adapter boundary for Trade Normalizer",
   "license": "MIT",
   "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22"
+  },
   "files": [
     "dist"
   ],

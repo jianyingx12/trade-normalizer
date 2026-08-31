@@ -1,9 +1,13 @@
 {
   "name": "@trade-normalizer/cli",
   "version": "0.0.0",
-  "description": "Command-line interface for Trade Normalizer",
+  "description": "CLI and high-level broker normalization API for Trade Normalizer",
   "license": "MIT",
   "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22"
+  },
   "files": [
     "dist"
   ],

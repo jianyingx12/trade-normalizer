@@ -4,6 +4,10 @@
   "description": "Canonical runtime schemas and shared types for Trade Normalizer",
   "license": "MIT",
   "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22"
+  },
   "files": [
     "dist"
   ],
