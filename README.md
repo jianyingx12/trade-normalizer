@@ -3,12 +3,11 @@
 Universal Trade Normalizer is an open-source TypeScript library and CLI for converting
 broker-specific trade exports into a deterministic canonical format.
 
-The repository foundation, canonical schemas, a narrowly scoped Robinhood equities activity
-adapter, deterministic long-equity FIFO reconstruction, and deterministic single-contract option
-FIFO reconstruction are complete. The core also reconstructs ambiguity-safe two-leg vertical
-spread lifecycles from canonical option results and promotes equity, ungrouped single-option, and
-vertical-spread lifecycles into non-overlapping canonical logical Trades. Execution promotion has
-not been implemented. No broker option export format is implemented yet.
+The repository includes canonical schemas, a Robinhood equities activity adapter, a fixed-profile
+IBKR equity execution adapter, deterministic long-equity and single-contract option FIFO
+reconstruction, and canonical logical Trade production. The core also reconstructs ambiguity-safe
+two-leg vertical spreads from canonical option results. No broker option export format is
+implemented yet.
 
 ## Goals
 
@@ -25,8 +24,8 @@ apps/                     Future demonstration applications
 fixtures/                 Broker and canonical test fixtures
 packages/
   adapters/
-    ibkr/                 Interactive Brokers adapter boundary
-    robinhood/            Robinhood adapter boundary
+    ibkr/                 Fixed-profile IBKR equity execution adapter
+    robinhood/            Robinhood equity activity adapter
     webull/               Webull adapter boundary
   cli/                    Command-line interface
   core/                   Broker-independent engine boundary
@@ -70,6 +69,9 @@ pnpm build
 pnpm cli normalize trades.csv --broker robinhood
 pnpm cli inspect trades.csv --broker robinhood
 pnpm cli validate trades.csv --broker robinhood
+pnpm cli normalize trades.csv --broker ibkr
+pnpm cli inspect trades.csv --broker ibkr
+pnpm cli validate trades.csv --broker ibkr
 ```
 
 The installed-package command has the same interface:
@@ -80,12 +82,18 @@ trade-normalizer normalize trades.csv --broker robinhood --output normalized.jso
 trade-normalizer inspect trades.csv --broker robinhood
 trade-normalizer inspect trades.csv --broker robinhood --json
 trade-normalizer validate trades.csv --broker robinhood
+trade-normalizer normalize trades.csv --broker ibkr
+trade-normalizer inspect trades.csv --broker ibkr
+trade-normalizer validate trades.csv --broker ibkr
 ```
 
 `normalize` writes a deterministic JSON envelope to stdout unless `--output` is provided. The
-envelope has `schemaVersion: "1"`, source and summary information, canonical logical Trades, and
-diagnostics. Decimal quantities and financial values are JSON strings. Date-only input stays
-date-only, and missing fees and net P&L remain absent rather than becoming zero.
+current envelope has `schemaVersion: "2"`, source and summary information (including retained
+execution count), canonical logical Trades, and diagnostics. Decimal quantities and financial
+values are JSON strings. Date-only input stays date-only. IBKR local datetimes remain local in
+programmatic execution evidence and are conservatively represented as date precision in Trades;
+the system never fabricates a UTC offset. Missing realized fees and net P&L remain absent when they
+cannot be known truthfully.
 
 `inspect` reports adaptation facts without reconstructing positions or Trades. `validate` checks
 UTF-8 file readability, broker compatibility, CSV structure, and canonical activity normalization.
@@ -106,18 +114,36 @@ atomic replacement, and the CLI refuses to overwrite its own input CSV.
 The CLI runs locally. It does not upload broker data, send telemetry, call external APIs, request
 market data, or use OpenAI services.
 
-Current broker-file support is limited to the observed Robinhood equities activity format and its
-documented transaction codes. Robinhood option rows, IBKR, and Webull are not implemented. The
-engine can produce `equity_long`, long/short call and put, and four vertical-spread Trade types when
-canonical activities are supplied, but the current CLI broker adapter produces equities only.
+## Supported Broker Profiles
+
+Broker selection is explicit; automatic detection is not enabled.
+
+- **Robinhood:** the observed Robinhood-style equities account-activity CSV profile. It provides
+  date-level account activity rather than confirmed fills, so the adapter emits `BrokerActivity`
+  and zero canonical executions.
+- **IBKR:** **UTN IBKR Trade Confirmation Execution CSV v1**. This requires the exact fixed
+  24-column profile implemented by the adapter; arbitrary Flex Query CSVs are not supported. Each
+  valid equity row emits one canonical `Execution` and one linked `BrokerActivity`.
+
+Both profiles feed the same equity FIFO reconstruction and canonical logical Trade layer. This is
+economic convergence, not source-evidence equivalence: broker IDs, account IDs, execution IDs,
+order IDs, timing precision, and canonical Trade IDs remain source-specific.
+
+Robinhood options, IBKR options, Webull, and unobserved variations of either supported CSV profile
+are not implemented. The core can produce `equity_long`, long/short call and put, and four
+vertical-spread Trade types when canonical activities are supplied, but current broker adapters
+produce equities only.
 
 ## Current Scope
 
 Repository tooling, package boundaries, canonical instruments, broker activities, executions,
 trades, fees, and diagnostics are defined and runtime-validated. The Robinhood adapter parses the
-observed synthetic equities activity format into `BrokerActivity`. The public core API
+observed equities activity format into `BrokerActivity`. The IBKR adapter parses its fixed Trade
+Confirmation profile into canonical executions and linked activities while retaining account,
+execution, order, venue, currency, reported commission, and local-time evidence. Reported
+commission is not treated as a complete canonical fee breakdown. The public core API
 `reconstructEquityPositions` reconstructs long-equity FIFO lots, matches, position lifecycles,
-known fees, and realized P&L without promoting date-only activity to `Execution`.
+known fees, and realized P&L from canonical activities.
 
 The core package can also parse standard compact or root-padded OCC/OSI equity option symbols into
 canonical option instruments and create deterministic contract keys from their complete identity.
@@ -139,5 +165,6 @@ runtime-validated logical Trades. It verifies global option ownership before pro
 upstream diagnostics, and returns structured `unpromoted` records when inconsistent ownership or
 an isolated promotion failure makes a Trade unsafe to produce.
 
-IBKR, Webull, execution promotion, strategies beyond vertical spreads, broker-specific option
-parsing, and exercise/assignment/expiration remain future work.
+Webull, arbitrary IBKR Flex profiles, direct reconstruction from executions, strategies beyond
+vertical spreads, broker-specific option parsing, and exercise/assignment/expiration remain future
+work.
