@@ -7,6 +7,8 @@ export {
 export { detectIbkrTradeConfirmationExecutionCsv } from './detection/detect-ibkr.js';
 export { parseIbkrTradeConfirmationExecutionCsv } from './parsing/parse-ibkr-csv.js';
 export type { IbkrTradeConfirmationExecutionRecord } from './parsing/ibkr-record.js';
+export { normalizeIbkrExecutionRecord } from './normalization/normalize-ibkr-record.js';
+export type { IbkrRecordNormalizationResult } from './normalization/normalize-ibkr-record.js';
 
 export const ibkrAdapter: BrokerAdapterDescriptor = {
   broker: 'ibkr',

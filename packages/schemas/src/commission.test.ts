@@ -21,6 +21,7 @@ describe('reported commission schema', () => {
     ['a positive charge', { amount: '1.25', currency: 'USD', effect: 'charge' }],
     ['a negative rebate', { amount: '-0.15', currency: 'USD', effect: 'rebate' }],
     ['a nonzero zero effect', { amount: '0.01', currency: 'USD', effect: 'zero' }],
+    ['a zero rebate', { amount: '0', currency: 'USD', effect: 'rebate' }],
     ['a JavaScript number', { amount: -0.15, currency: 'USD', effect: 'charge' }],
     ['a lowercase currency', { amount: '-0.15', currency: 'usd', effect: 'charge' }],
   ])('rejects %s', (_label, commission) => {

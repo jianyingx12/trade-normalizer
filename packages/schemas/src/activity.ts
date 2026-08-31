@@ -34,6 +34,7 @@ export const brokerActivitySchema = z
     broker: brokerIdSchema,
     accountId: z.string().trim().min(1).max(256).optional(),
     activityType: brokerActivityTypeSchema,
+    executionId: canonicalIdSchema.optional(),
     instrument: instrumentSchema.optional(),
     activityDate: isoDateSchema,
     timestamp: isoUtcTimestampSchema.optional(),

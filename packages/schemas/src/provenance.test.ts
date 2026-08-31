@@ -14,6 +14,10 @@ describe('source provenance schema', () => {
         orderReference: 'strategy-alpha',
         instrumentId: 'broker-instrument-42',
       },
+      brokerMetadata: {
+        exchange: 'NASDAQ',
+        isApiOrder: 'true',
+      },
       sourceIndex: 2,
     });
 
@@ -24,6 +28,10 @@ describe('source provenance schema', () => {
       orderId: 'order-789',
       orderReference: 'strategy-alpha',
       instrumentId: 'broker-instrument-42',
+    });
+    expect(provenance.brokerMetadata).toEqual({
+      exchange: 'NASDAQ',
+      isApiOrder: 'true',
     });
   });
 

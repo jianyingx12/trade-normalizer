@@ -21,8 +21,8 @@ export const reportedCommissionSchema = z
   .strict()
   .superRefine((commission, context) => {
     const effectMatchesAmount =
-      (commission.effect === 'charge' && commission.amount.isNegative()) ||
-      (commission.effect === 'rebate' && commission.amount.isPositive()) ||
+      (commission.effect === 'charge' && commission.amount.lt(0)) ||
+      (commission.effect === 'rebate' && commission.amount.gt(0)) ||
       (commission.effect === 'zero' && commission.amount.isZero());
 
     if (!effectMatchesAmount) {
