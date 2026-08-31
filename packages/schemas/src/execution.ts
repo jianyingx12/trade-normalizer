@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { currencyCodeSchema, reportedCommissionSchema } from './commission.js';
 import { executionTimeSchema } from './execution-time.js';
 import { feeBreakdownSchema } from './fee.js';
 import { instrumentSchema } from './instrument.js';
@@ -26,7 +27,9 @@ export const executionSchema = z
     positionEffect: positionEffectSchema.default('unknown'),
     quantity: positiveDecimalSchema,
     price: nonNegativeDecimalSchema,
-    fees: feeBreakdownSchema,
+    currency: currencyCodeSchema.optional(),
+    reportedCommission: reportedCommissionSchema.optional(),
+    fees: feeBreakdownSchema.optional(),
     executionTime: executionTimeSchema,
     provenance: executionProvenanceSchema,
   })

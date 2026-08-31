@@ -51,6 +51,28 @@ describe('broker activity schema', () => {
     expect(activity.timestamp).toBe('2026-08-03T14:31:00.000Z');
   });
 
+  it('preserves trade currency and commission evidence without complete fees', () => {
+    const activity = brokerActivitySchema.parse({
+      id: 'activity_commission',
+      broker: 'ibkr',
+      activityType: 'trade',
+      activityDate: '2026-08-03',
+      timestampPrecision: 'date',
+      currency: 'EUR',
+      reportedCommission: {
+        amount: '-1.25',
+        currency: 'GBP',
+        effect: 'charge',
+      },
+      provenance,
+    });
+
+    expect(activity.currency).toBe('EUR');
+    expect(activity.reportedCommission?.amount.equals('-1.25')).toBe(true);
+    expect(activity.reportedCommission?.currency).toBe('GBP');
+    expect(activity.fees).toBeUndefined();
+  });
+
   it('validates date-only option trade activity without inventing fees or a timestamp', () => {
     const activity = brokerActivitySchema.parse({
       id: 'activity_option_date',

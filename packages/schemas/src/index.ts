@@ -1,4 +1,5 @@
 export * from './activity.js';
+export * from './commission.js';
 export * from './execution.js';
 export * from './execution-time.js';
 export * from './fee.js';

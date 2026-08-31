@@ -93,6 +93,25 @@ describe('execution schema', () => {
     expect(execution.executionTime).toEqual({ precision: 'date', date: '2026-08-20' });
   });
 
+  it('preserves currency and signed commission without inventing a fee breakdown', () => {
+    const execution = executionSchema.parse({
+      ...validExecution,
+      currency: 'CAD',
+      reportedCommission: {
+        amount: '0.20',
+        currency: 'USD',
+        effect: 'rebate',
+      },
+      fees: undefined,
+    });
+
+    expect(execution.currency).toBe('CAD');
+    expect(execution.reportedCommission?.amount.equals('0.20')).toBe(true);
+    expect(execution.reportedCommission?.currency).toBe('USD');
+    expect(execution.reportedCommission?.effect).toBe('rebate');
+    expect(execution.fees).toBeUndefined();
+  });
+
   it('rejects floating-point quantities and invalid timing variants', () => {
     expect(executionSchema.safeParse({ ...validExecution, quantity: 0.1 }).success).toBe(false);
     expect(

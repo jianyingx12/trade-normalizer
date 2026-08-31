@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { currencyCodeSchema, reportedCommissionSchema } from './commission.js';
 import { feeBreakdownSchema } from './fee.js';
 import { instrumentSchema } from './instrument.js';
 import {
@@ -39,6 +40,8 @@ export const brokerActivitySchema = z
     quantity: positiveDecimalSchema.optional(),
     price: nonNegativeDecimalSchema.optional(),
     grossAmount: decimalSchema.optional(),
+    currency: currencyCodeSchema.optional(),
+    reportedCommission: reportedCommissionSchema.optional(),
     fees: feeBreakdownSchema.optional(),
     provenance: sourceProvenanceSchema,
   })
