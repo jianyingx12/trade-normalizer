@@ -9,6 +9,7 @@ const fixturePath = resolve('fixtures/robinhood/robinhood-equities-synthetic.csv
 const ibkrFixturePath = resolve('fixtures/ibkr/ibkr-equities-executions-synthetic.csv');
 const identicalDuplicatePath = resolve('fixtures/ibkr/ibkr-identical-duplicate-synthetic.csv');
 const conflictingDuplicatePath = resolve('fixtures/ibkr/ibkr-conflicting-duplicate-synthetic.csv');
+const unsupportedIbkrProfilePath = resolve('fixtures/ibkr/ibkr-unsupported-profile-synthetic.csv');
 
 interface CapturedRun {
   readonly code: number;
@@ -63,6 +64,47 @@ describe('CLI command integration', () => {
     expect(JSON.parse(result.files['normalized.json']!)).toMatchObject({
       schemaVersion: '2',
       summary: { executions: 0, trades: 4 },
+    });
+  });
+
+  it('normalizes the fixed IBKR profile to uncontaminated stdout JSON', async () => {
+    const result = await run(['normalize', ibkrFixturePath, '--broker', 'ibkr']);
+    const document = JSON.parse(result.stdout) as {
+      schemaVersion: string;
+      summary: { sourceRecords: number; executions: number; activities: number; trades: number };
+      trades: { opened: { precision: string; timestamp?: string } }[];
+    };
+
+    expect(result.code).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(document).toMatchObject({
+      schemaVersion: '2',
+      summary: { sourceRecords: 4, executions: 4, activities: 4, trades: 2 },
+    });
+    expect(document.trades.every((trade) => trade.opened.precision === 'date')).toBe(true);
+    expect(document.trades.every((trade) => trade.opened.timestamp === undefined)).toBe(true);
+    expect(result.stdout).not.toMatch(/2026-08-\d{2}T[^"\n]*Z/);
+    expect(result.stdout.endsWith('\n')).toBe(true);
+  });
+
+  it('writes IBKR normalization to an output file without contaminating stdout', async () => {
+    const result = await run([
+      'normalize',
+      ibkrFixturePath,
+      '--broker',
+      'ibkr',
+      '--output',
+      'ibkr-normalized.json',
+    ]);
+    const document = JSON.parse(result.files['ibkr-normalized.json']!);
+
+    expect(result.code).toBe(0);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toBe('');
+    expect(document).toMatchObject({
+      schemaVersion: '2',
+      source: { broker: 'ibkr', file: 'ibkr-equities-executions-synthetic.csv' },
+      summary: { executions: 4, activities: 4, trades: 2 },
     });
   });
 
@@ -123,6 +165,26 @@ describe('CLI command integration', () => {
     expect(result.code).toBe(1);
     expect(result.stdout).toBe('');
     expect(result.stderr).toContain('Conflicting IBKR rows share one stable execution identity');
+  });
+
+  it('rejects an IBKR CSV outside the exact supported profile', async () => {
+    const result = await run(['normalize', unsupportedIbkrProfilePath, '--broker', 'ibkr']);
+
+    expect(result.code).toBe(1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toContain(
+      'IBKR Trade Confirmation CSV headers do not match the required UTN execution profile',
+    );
+  });
+
+  it('names the fixed IBKR profile in command help', async () => {
+    const result = await run(['normalize', '--help']);
+
+    expect(result.code).toBe(0);
+    expect(result.stdout.replace(/\s+/g, ' ')).toContain(
+      'UTN IBKR Trade Confirmation Execution CSV v1',
+    );
+    expect(result.stderr).toBe('');
   });
 
   it('uses exit code 1 and stderr for an unsupported broker', async () => {
