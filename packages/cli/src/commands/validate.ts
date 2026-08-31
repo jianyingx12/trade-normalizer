@@ -10,6 +10,10 @@ export interface ValidateCommandOptions {
   readonly broker: string;
 }
 
+function countLabel(count: number, singular: string, plural = `${singular}s`): string {
+  return `${count} ${count === 1 ? singular : plural}`;
+}
+
 export async function runValidateCommand(
   inputFile: string,
   options: ValidateCommandOptions,
@@ -20,7 +24,7 @@ export async function runValidateCommand(
   if (errors.length > 0) throw new ValidationFailedError(errors);
   const warnings = adapted.diagnostics.filter((diagnostic) => diagnostic.severity === 'warning');
   writeStdout(
-    `Valid: ${basename(inputFile)} (${adapted.sourceRecordCount} records, ${adapted.executions.length} executions, ${adapted.activities.length} activities, ${warnings.length} warnings)\n`,
+    `Valid: ${basename(inputFile)} (${countLabel(adapted.sourceRecordCount, 'record')}, ${countLabel(adapted.executions.length, 'execution')}, ${countLabel(adapted.activities.length, 'activity', 'activities')}, ${countLabel(warnings.length, 'warning')})\n`,
   );
 }
 

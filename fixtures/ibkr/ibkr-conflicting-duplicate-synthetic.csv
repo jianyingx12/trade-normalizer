@@ -1,0 +1,3 @@
+"ClientAccountID","CurrencyPrimary","AssetClass","Symbol","Description","Conid","UnderlyingSymbol","Multiplier","Strike","Expiry","Put/Call","Date/Time","Exchange","Buy/Sell","Quantity","Price","TradeID","ExecID","OrigTradeID","OrderID","OrderReference","IsAPIOrder","Commission","CommissionCurrency"
+"DU-SYNTHETIC-001","USD","STK","AAPL","APPLE INC","100001","","","","","","20260803;093015","NASDAQ","BUY","10","205.12","T-1001","E-1001","","O-5001","opening-buy","Y","-1.00","USD"
+"DU-SYNTHETIC-001","USD","STK","AAPL","APPLE INC","100001","","","","","","20260803;093015","NASDAQ","BUY","10","999.99","T-1001","E-1001","","O-5001","opening-buy","Y","-1.00","USD"

@@ -41,4 +41,31 @@ describe('registered broker adaptation', () => {
       adapted.executions.map((execution) => execution.id),
     );
   });
+
+  it.each([
+    ['identical', 'ibkr-identical-duplicate-synthetic.csv', 'warning', []],
+    ['conflicting', 'ibkr-conflicting-duplicate-synthetic.csv', 'error', ['price']],
+  ] as const)(
+    'conserves one execution/activity pair for %s duplicate identities',
+    (_kind, sourceFile, severity, differingFields) => {
+      const adapted = adaptBrokerSource({
+        source: fixture(`fixtures/ibkr/${sourceFile}`),
+        sourceFile,
+        broker: 'ibkr',
+      });
+
+      expect(adapted.sourceRecordCount).toBe(2);
+      expect(adapted.executions).toHaveLength(1);
+      expect(adapted.activities).toHaveLength(1);
+      expect(adapted.activities[0]?.executionId).toBe(adapted.executions[0]?.id);
+      expect(adapted.diagnostics).toMatchObject([
+        {
+          severity,
+          code: 'DUPLICATE_EXECUTION',
+          sourceIndexes: [0, 1],
+          details: { differingFields },
+        },
+      ]);
+    },
+  );
 });

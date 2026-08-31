@@ -11,6 +11,8 @@ import { normalizeBrokerFile, normalizeBrokerSource } from './normalize-broker-s
 
 const fixturePath = resolve('fixtures/robinhood/robinhood-equities-synthetic.csv');
 const ibkrFixturePath = resolve('fixtures/ibkr/ibkr-equities-executions-synthetic.csv');
+const identicalDuplicatePath = resolve('fixtures/ibkr/ibkr-identical-duplicate-synthetic.csv');
+const conflictingDuplicatePath = resolve('fixtures/ibkr/ibkr-conflicting-duplicate-synthetic.csv');
 
 describe('normalizeBrokerFile', () => {
   it('adapts the Robinhood fixture through canonical Trade production', async () => {
@@ -89,6 +91,26 @@ describe('normalizeBrokerSource', () => {
       ['MSFT', 'open'],
     ]);
   });
+
+  it.each([
+    ['identical', identicalDuplicatePath, 'warning'],
+    ['conflicting', conflictingDuplicatePath, 'error'],
+  ] as const)(
+    'normalizes one retained Trade from %s IBKR duplicate evidence',
+    async (_kind, filePath, severity) => {
+      const result = await normalizeBrokerFile({ filePath, broker: 'ibkr' });
+
+      expect(result.summary).toMatchObject({
+        sourceRecords: 2,
+        executions: 1,
+        activities: 1,
+        trades: 1,
+        diagnostics: 1,
+      });
+      expect(result.diagnostics).toMatchObject([{ severity, code: 'DUPLICATE_EXECUTION' }]);
+      expect(result.trades[0]).toMatchObject({ underlying: 'AAPL', status: 'open' });
+    },
+  );
 
   it.each([
     ['invalid headers', 'Wrong,Headers\nvalue,value'],

@@ -10,6 +10,8 @@ import { runValidateCommand } from './validate.js';
 
 const fixturePath = resolve('fixtures/robinhood/robinhood-equities-synthetic.csv');
 const ibkrFixturePath = resolve('fixtures/ibkr/ibkr-equities-executions-synthetic.csv');
+const identicalDuplicatePath = resolve('fixtures/ibkr/ibkr-identical-duplicate-synthetic.csv');
+const conflictingDuplicatePath = resolve('fixtures/ibkr/ibkr-conflicting-duplicate-synthetic.csv');
 const headers =
   '"Activity Date","Process Date","Settle Date","Instrument","Description","Trans Code","Quantity","Price","Amount"';
 let temporaryDirectory: string;
@@ -104,6 +106,23 @@ describe('runValidateCommand', () => {
     );
   });
 
+  it('accepts an identical IBKR duplicate with one warning', async () => {
+    let stdout = '';
+    await runValidateCommand(identicalDuplicatePath, { broker: 'ibkr' }, (text) => {
+      stdout += text;
+    });
+
+    expect(stdout).toBe(
+      'Valid: ibkr-identical-duplicate-synthetic.csv (2 records, 1 execution, 1 activity, 1 warning)\n',
+    );
+  });
+
+  it('rejects a conflicting IBKR duplicate diagnostic', async () => {
+    await expect(
+      runValidateCommand(conflictingDuplicatePath, { broker: 'ibkr' }),
+    ).rejects.toBeInstanceOf(ValidationFailedError);
+  });
+
   it('allows a usable normalization result containing warnings', async () => {
     const filePath = await sourceFile(
       'warning.csv',
@@ -114,7 +133,7 @@ describe('runValidateCommand', () => {
     await runValidateCommand(filePath, { broker: 'robinhood' }, (text) => {
       stdout += text;
     });
-    expect(stdout).toContain('1 warnings');
+    expect(stdout).toContain('1 warning');
   });
 
   it('rejects row-level normalization errors', async () => {

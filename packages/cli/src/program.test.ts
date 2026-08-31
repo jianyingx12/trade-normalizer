@@ -7,6 +7,8 @@ import type { CliRuntime } from './runtime.js';
 
 const fixturePath = resolve('fixtures/robinhood/robinhood-equities-synthetic.csv');
 const ibkrFixturePath = resolve('fixtures/ibkr/ibkr-equities-executions-synthetic.csv');
+const identicalDuplicatePath = resolve('fixtures/ibkr/ibkr-identical-duplicate-synthetic.csv');
+const conflictingDuplicatePath = resolve('fixtures/ibkr/ibkr-conflicting-duplicate-synthetic.csv');
 
 interface CapturedRun {
   readonly code: number;
@@ -88,6 +90,39 @@ describe('CLI command integration', () => {
     expect(result.code).toBe(0);
     expect(result.stdout).toContain(expected);
     expect(result.stderr).toBe('');
+  });
+
+  it('keeps an identical IBKR duplicate usable with a warning', async () => {
+    const result = await run(['validate', identicalDuplicatePath, '--broker', 'ibkr']);
+
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain('1 execution, 1 activity, 1 warning');
+    expect(result.stderr).toBe('');
+  });
+
+  it('returns safe partial normalization for a conflicting duplicate', async () => {
+    const result = await run(['normalize', conflictingDuplicatePath, '--broker', 'ibkr']);
+    const document = JSON.parse(result.stdout) as {
+      summary: { executions: number; activities: number; trades: number; diagnostics: number };
+      diagnostics: { severity: string; code: string }[];
+    };
+
+    expect(result.code).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(document.summary).toEqual(
+      expect.objectContaining({ executions: 1, activities: 1, trades: 1, diagnostics: 1 }),
+    );
+    expect(document.diagnostics).toMatchObject([
+      { severity: 'error', code: 'DUPLICATE_EXECUTION' },
+    ]);
+  });
+
+  it('fails validation for a conflicting IBKR duplicate', async () => {
+    const result = await run(['validate', conflictingDuplicatePath, '--broker', 'ibkr']);
+
+    expect(result.code).toBe(1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toContain('Conflicting IBKR rows share one stable execution identity');
   });
 
   it('uses exit code 1 and stderr for an unsupported broker', async () => {
