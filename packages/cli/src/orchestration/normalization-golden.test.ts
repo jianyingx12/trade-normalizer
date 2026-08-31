@@ -19,23 +19,26 @@ it('preserves the checked-in V1 golden contract when the current envelope advanc
   expect(legacy.summary).not.toHaveProperty('executions');
 });
 
-it('emits the current V2 Robinhood envelope deterministically', async () => {
-  const envelope = await normalizeBrokerFile({
-    filePath: resolve('fixtures/robinhood/robinhood-equities-synthetic.csv'),
-    broker: 'robinhood',
-  });
-  const first = serializeJson(envelope);
-  const second = serializeJson(
-    await normalizeBrokerFile({
-      filePath: resolve('fixtures/robinhood/robinhood-equities-synthetic.csv'),
-      broker: 'robinhood',
-    }),
-  );
+it.each([
+  [
+    'Robinhood',
+    'robinhood',
+    'fixtures/robinhood/robinhood-equities-synthetic.csv',
+    '../test-fixtures/robinhood-equities-normalized.v2.json',
+  ],
+  [
+    'IBKR',
+    'ibkr',
+    'fixtures/ibkr/ibkr-equities-executions-synthetic.csv',
+    '../test-fixtures/ibkr-equities-normalized.v2.json',
+  ],
+] as const)(
+  'matches the stable V2 %s normalization envelope',
+  async (_name, broker, file, golden) => {
+    const envelope = await normalizeBrokerFile({ filePath: resolve(file), broker });
+    const json = serializeJson(envelope);
 
-  expect(first).toBe(second);
-  expect(first).not.toContain(resolve('.'));
-  expect(JSON.parse(first)).toMatchObject({
-    schemaVersion: '2',
-    summary: { sourceRecords: 17, executions: 0, activities: 17, trades: 4 },
-  });
-});
+    expect(json).not.toContain(resolve('.'));
+    await expect(json).toMatchFileSnapshot(golden);
+  },
+);

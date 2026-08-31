@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "2",
+  "source": {
+    "broker": "ibkr",
+    "file": "ibkr-equities-executions-synthetic.csv"
+  },
+  "summary": {
+    "sourceRecords": 4,
+    "executions": 4,
+    "activities": 4,
+    "trades": 2,
+    "diagnostics": 0,
+    "activityTypes": {
+      "trade": 4,
+      "dividend": 0,
+      "deposit": 0,
+      "withdrawal": 0,
+      "fee": 0,
+      "split": 0,
+      "unknown": 0
+    },
+    "assetTypes": {
+      "equity": 4,
+      "option": 0,
+      "unspecified": 0
+    }
+  },
+  "trades": [
+    {
+      "id": "trade:v1:241a9f4b702912a6fd1bcfdb67bb982fbb21777461ef406a1fbe79061d906220",
+      "broker": "ibkr",
+      "accountId": "DU-SYNTHETIC-001",
+      "underlying": "MSFT",
+      "assetType": "equity",
+      "strategy": "equity_long",
+      "status": "open",
+      "opened": {
+        "date": "2026-08-04",
+        "precision": "date"
+      },
+      "legs": [
+        {
+          "id": "trade-leg:v1:555c5470fdb0097f0474c95368f241b10c78ac88b2e14f10a9e6ed2e6c7eac02",
+          "instrument": {
+            "assetType": "equity",
+            "symbol": "MSFT"
+          },
+          "direction": "long",
+          "quantity": "8",
+          "openQuantity": "8",
+          "lifecycleIds": [
+            "lifecycle:ibkr:activity:DU-SYNTHETIC-001:execution:E-1002"
+          ],
+          "openingActivityIds": [
+            "ibkr:activity:DU-SYNTHETIC-001:execution:E-1002",
+            "ibkr:activity:DU-SYNTHETIC-001:execution:E-1003"
+          ],
+          "closingActivityIds": [],
+          "executionIds": [],
+          "grossRealizedPnl": "0",
+          "fees": "0",
+          "netRealizedPnl": "0"
+        }
+      ],
+      "grossRealizedPnl": "0",
+      "fees": "0",
+      "netRealizedPnl": "0",
+      "warnings": []
+    },
+    {
+      "id": "trade:v1:6b2dc032e4eb489dcf81a43b3debd2558638e3ea0aa9cb2a9f3ce3614773ccfa",
+      "broker": "ibkr",
+      "accountId": "DU-SYNTHETIC-001",
+      "underlying": "AAPL",
+      "assetType": "equity",
+      "strategy": "equity_long",
+      "status": "partially_closed",
+      "opened": {
+        "date": "2026-08-03",
+        "precision": "date"
+      },
+      "legs": [
+        {
+          "id": "trade-leg:v1:79a9a3e3accc5c8b2ca2254f2d6b902207558c55ae93f00989bfd04219f9f15a",
+          "instrument": {
+            "assetType": "equity",
+            "symbol": "AAPL"
+          },
+          "direction": "long",
+          "quantity": "10",
+          "openQuantity": "6",
+          "lifecycleIds": [
+            "lifecycle:ibkr:activity:DU-SYNTHETIC-001:execution:E-1001"
+          ],
+          "openingActivityIds": [
+            "ibkr:activity:DU-SYNTHETIC-001:execution:E-1001"
+          ],
+          "closingActivityIds": [
+            "ibkr:activity:DU-SYNTHETIC-001:execution:E-1004"
+          ],
+          "executionIds": [],
+          "grossRealizedPnl": "44.52"
+        }
+      ],
+      "grossRealizedPnl": "44.52",
+      "warnings": []
+    }
+  ],
+  "diagnostics": []
+}
