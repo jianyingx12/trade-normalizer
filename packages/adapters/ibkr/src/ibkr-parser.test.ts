@@ -18,6 +18,41 @@ function csvLine(values: readonly string[]): string {
 }
 
 describe('IBKR Trade Confirmation execution CSV parser', () => {
+  it('parses BOM, CRLF, commas, semicolons, and escaped quotes as one logical record', () => {
+    const row = [
+      'DU-SYNTHETIC-001',
+      'USD',
+      'STK',
+      'AAPL',
+      'Broker said "filled", route; synthetic',
+      '100001',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '20260803;093015',
+      'NASDAQ',
+      'BUY',
+      '10',
+      '205.12',
+      'T-1001',
+      'E-1001',
+      '',
+      'O-5001',
+      '',
+      'Y',
+      '-1.00',
+      'USD',
+    ];
+    const source = `\uFEFF${csvLine(IBKR_TRADE_CONFIRMATION_EXECUTION_HEADERS)}\r\n${csvLine(row)}\r\n`;
+    const result = parseIbkrTradeConfirmationExecutionCsv(source);
+
+    expect(result.diagnostics).toEqual([]);
+    expect(result.records).toHaveLength(1);
+    expect(result.records[0]).toMatchObject({ description: row[4], sourceIndex: 0 });
+  });
+
   it('detects only the exact fixed-profile header', () => {
     expect(detectIbkrTradeConfirmationExecutionCsv(fixture)).toBe(true);
 

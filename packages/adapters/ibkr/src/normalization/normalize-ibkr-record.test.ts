@@ -133,6 +133,19 @@ describe('IBKR execution record normalization', () => {
     expect(result.execution?.provenance.brokerMetadata?.isApiOrder).toBe('false');
   });
 
+  it('preserves extreme Decimal quantity and price without precision loss', () => {
+    const result = normalize({
+      quantity: '1000000000000000000000000000000',
+      price: '0.000000000000000000000001',
+      commission: '',
+      commissionCurrency: '',
+    });
+
+    expect(result.diagnostics).toEqual([]);
+    expect(result.execution?.quantity.toFixed()).toBe('1000000000000000000000000000000');
+    expect(result.execution?.price.toFixed()).toBe('0.000000000000000000000001');
+  });
+
   it.each([
     ['non-equity asset', { assetClass: 'OPT' }, 'UNSUPPORTED_ASSET_TYPE'],
     ['unknown side', { buySell: 'BOT' }, 'INVALID_EXECUTION_SIDE'],
@@ -147,6 +160,10 @@ describe('IBKR execution record normalization', () => {
     ['SELL with positive quantity', { buySell: 'SELL', quantity: '10' }, 'QUANTITY_SIDE_CONFLICT'],
     ['invalid calendar timestamp', { dateTime: '20260230;093015' }, 'INVALID_TIMESTAMP'],
     ['missing broker identity', { execId: '', tradeId: '' }, 'INVALID_EXECUTION_ID'],
+    ['blank account ID', { clientAccountId: '   ' }, 'INVALID_EXECUTION_ID'],
+    ['blank symbol', { symbol: '   ' }, 'INVALID_INSTRUMENT'],
+    ['blank quantity', { quantity: '   ' }, 'INVALID_QUANTITY'],
+    ['blank price', { price: '   ' }, 'INVALID_PRICE'],
   ])('diagnoses %s without emitting partial canonical records', (_label, override, code) => {
     const result = normalize(override);
 

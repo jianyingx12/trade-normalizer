@@ -1,4 +1,5 @@
 import { Decimal } from 'decimal.js';
+import { decimalToString } from '@trade-normalizer/core';
 
 export type JsonValue =
   null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue };
@@ -10,7 +11,7 @@ function convert(value: unknown, ancestors: WeakSet<object>): JsonValue | undefi
     if (!Number.isFinite(value)) throw new TypeError('Cannot serialize a non-finite number');
     return value;
   }
-  if (Decimal.isDecimal(value)) return value.toString();
+  if (Decimal.isDecimal(value)) return decimalToString(value);
   if (typeof value !== 'object') {
     throw new TypeError(`Cannot serialize value of type ${typeof value}`);
   }

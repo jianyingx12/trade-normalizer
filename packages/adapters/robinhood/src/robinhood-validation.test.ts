@@ -39,6 +39,18 @@ function adaptRow(override: Readonly<Record<number, string>>) {
 }
 
 describe('Robinhood CSV validation', () => {
+  it('parses BOM, CRLF, commas, semicolons, and escaped quotes without changing source order', () => {
+    const description = 'Broker said "filled", route; synthetic';
+    const row = [...baseRow];
+    row[4] = description;
+    const source = `\uFEFF${csvLine(ROBINHOOD_ACTIVITY_HEADERS)}\r\n${csvLine(row)}\r\n`;
+    const result = parseRobinhoodActivityCsv(source);
+
+    expect(result.diagnostics).toEqual([]);
+    expect(result.records).toHaveLength(1);
+    expect(result.records[0]).toMatchObject({ description, sourceIndex: 0 });
+  });
+
   it('fails clearly when an exact required header is missing', () => {
     const headersWithoutAmount = ROBINHOOD_ACTIVITY_HEADERS.slice(0, -1);
     const result = parseRobinhoodActivityCsv(csvLine(headersWithoutAmount));
@@ -72,6 +84,27 @@ describe('Robinhood CSV validation', () => {
 
     expect(result.activities).toEqual([]);
     expect(result.diagnostics.some((item) => item.code === 'INVALID_PRICE')).toBe(true);
+  });
+
+  it.each([
+    ['blank instrument', { 3: '   ' }, 'INVALID_INSTRUMENT'],
+    ['blank quantity', { 6: '   ' }, 'INVALID_QUANTITY'],
+    ['negative-formatted price', { 7: '($205.12)' }, 'INVALID_PRICE'],
+    ['malformed amount', { 8: '$2,051.2' }, 'INVALID_AMOUNT'],
+    ['impossible activity date', { 0: '2/30/2026' }, 'INVALID_ACTIVITY_DATE'],
+  ])('rejects %s without emitting a trade activity', (_label, override, code) => {
+    const result = adaptRow(override);
+
+    expect(result.activities).toEqual([]);
+    expect(result.diagnostics).toMatchObject([{ severity: 'error', code }]);
+  });
+
+  it('preserves an explicitly reported zero trade price and amount', () => {
+    const result = adaptRow({ 7: '$0.00', 8: '($0.00)' });
+
+    expect(result.diagnostics).toEqual([]);
+    expect(result.activities[0]?.price?.isZero()).toBe(true);
+    expect(result.activities[0]?.grossAmount?.isZero()).toBe(true);
   });
 
   it('preserves safe activity and warns when amount reconciliation fails', () => {

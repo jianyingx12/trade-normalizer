@@ -28,4 +28,17 @@ describe('serializeJson', () => {
     circular.self = circular;
     expect(() => serializeJson(circular)).toThrow('circular');
   });
+
+  it('never uses exponent notation for extreme Decimal values', () => {
+    const serialized = serializeJson({
+      large: new Decimal('1000000000000000000000000000000'),
+      small: new Decimal('0.000000000000000000000001'),
+    });
+
+    expect(JSON.parse(serialized)).toEqual({
+      large: '1000000000000000000000000000000',
+      small: '0.000000000000000000000001',
+    });
+    expect(serialized.toLowerCase()).not.toMatch(/\d+e[+-]?\d+/);
+  });
 });
