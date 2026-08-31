@@ -106,6 +106,33 @@ describe('IBKR execution record normalization', () => {
     });
   });
 
+  it('preserves exact zero commission without creating complete fees', () => {
+    const result = normalize({ commission: '0', commissionCurrency: 'EUR' });
+
+    expect(result.diagnostics).toEqual([]);
+    expect(result.execution?.reportedCommission?.amount.isZero()).toBe(true);
+    expect(result.execution?.reportedCommission).toMatchObject({
+      currency: 'EUR',
+      effect: 'zero',
+    });
+    expect(result.execution?.fees).toBeUndefined();
+  });
+
+  it('allows absent commission evidence when both commission fields are blank', () => {
+    const result = normalize({ commission: '', commissionCurrency: '' });
+
+    expect(result.diagnostics).toEqual([]);
+    expect(result.execution?.reportedCommission).toBeUndefined();
+    expect(result.activity?.reportedCommission).toBeUndefined();
+  });
+
+  it('preserves a non-API order as source metadata', () => {
+    const result = normalize({}, 1);
+
+    expect(result.diagnostics).toEqual([]);
+    expect(result.execution?.provenance.brokerMetadata?.isApiOrder).toBe('false');
+  });
+
   it.each([
     ['non-equity asset', { assetClass: 'OPT' }, 'UNSUPPORTED_ASSET_TYPE'],
     ['unknown side', { buySell: 'BOT' }, 'INVALID_EXECUTION_SIDE'],
@@ -114,6 +141,11 @@ describe('IBKR execution record normalization', () => {
     ['zero price', { price: '0' }, 'INVALID_PRICE'],
     ['malformed timestamp', { dateTime: '2026-08-03 09:30:15' }, 'INVALID_TIMESTAMP'],
     ['malformed commission', { commission: '$1.00' }, 'INVALID_COMMISSION'],
+    ['invalid primary currency', { currencyPrimary: 'usd' }, 'INVALID_CURRENCY'],
+    ['missing commission currency', { commissionCurrency: '' }, 'INVALID_CURRENCY'],
+    ['invalid API-order flag', { isApiOrder: 'UNKNOWN' }, 'INVALID_SOURCE_METADATA'],
+    ['SELL with positive quantity', { buySell: 'SELL', quantity: '10' }, 'QUANTITY_SIDE_CONFLICT'],
+    ['invalid calendar timestamp', { dateTime: '20260230;093015' }, 'INVALID_TIMESTAMP'],
     ['missing broker identity', { execId: '', tradeId: '' }, 'INVALID_EXECUTION_ID'],
   ])('diagnoses %s without emitting partial canonical records', (_label, override, code) => {
     const result = normalize(override);
