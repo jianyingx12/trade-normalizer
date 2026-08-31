@@ -10,6 +10,7 @@ import {
 import { normalizeBrokerFile, normalizeBrokerSource } from './normalize-broker-source.js';
 
 const fixturePath = resolve('fixtures/robinhood/robinhood-equities-synthetic.csv');
+const ibkrFixturePath = resolve('fixtures/ibkr/ibkr-equities-executions-synthetic.csv');
 
 describe('normalizeBrokerFile', () => {
   it('adapts the Robinhood fixture through canonical Trade production', async () => {
@@ -58,11 +59,29 @@ describe('normalizeBrokerFile', () => {
 describe('normalizeBrokerSource', () => {
   it('rejects unsupported brokers with the supported broker list', () => {
     expect(() =>
-      normalizeBrokerSource({ source: '', sourceFile: 'input.csv', broker: 'ibkr' }),
+      normalizeBrokerSource({ source: '', sourceFile: 'input.csv', broker: 'webull' }),
     ).toThrow(UnsupportedBrokerError);
     expect(() =>
-      normalizeBrokerSource({ source: '', sourceFile: 'input.csv', broker: 'ibkr' }),
-    ).toThrow('Unsupported broker: ibkr. Supported brokers: robinhood');
+      normalizeBrokerSource({ source: '', sourceFile: 'input.csv', broker: 'webull' }),
+    ).toThrow('Unsupported broker: webull. Supported brokers: robinhood, ibkr');
+  });
+
+  it('normalizes the registered IBKR fixture through the activity reconstruction path', async () => {
+    const result = await normalizeBrokerFile({ filePath: ibkrFixturePath, broker: 'ibkr' });
+
+    expect(result.source).toEqual({
+      broker: 'ibkr',
+      file: 'ibkr-equities-executions-synthetic.csv',
+    });
+    expect(result.summary).toMatchObject({ sourceRecords: 4, activities: 4, trades: 2 });
+    expect(
+      result.trades
+        .map((trade) => [trade.underlying, trade.status])
+        .sort((left, right) => left[0]!.localeCompare(right[0]!)),
+    ).toEqual([
+      ['AAPL', 'partially_closed'],
+      ['MSFT', 'open'],
+    ]);
   });
 
   it.each([

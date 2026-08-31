@@ -3,6 +3,7 @@ export {
   isSupportedBroker,
   SUPPORTED_BROKERS,
   type RegisteredBrokerAdapter,
+  type RegisteredBrokerAdapterResult,
   type SupportedBroker,
 } from './brokers/registry.js';
 export {

@@ -79,12 +79,12 @@ describe('CLI command integration', () => {
   });
 
   it('uses exit code 1 and stderr for an unsupported broker', async () => {
-    const result = await run(['normalize', fixturePath, '--broker', 'ibkr']);
+    const result = await run(['normalize', fixturePath, '--broker', 'webull']);
 
     expect(result.code).toBe(1);
     expect(result.stdout).toBe('');
-    expect(result.stderr).toContain('Unsupported broker: ibkr');
-    expect(result.stderr).toContain('Supported brokers: robinhood');
+    expect(result.stderr).toContain('Unsupported broker: webull');
+    expect(result.stderr).toContain('Supported brokers: robinhood, ibkr');
   });
 
   it('uses exit code 1 for a missing input file', async () => {

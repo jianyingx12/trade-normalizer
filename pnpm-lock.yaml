@@ -62,6 +62,9 @@ importers:
 
   packages/cli:
     dependencies:
+      '@trade-normalizer/adapter-ibkr':
+        specifier: workspace:*
+        version: link:../adapters/ibkr
       '@trade-normalizer/adapter-robinhood':
         specifier: workspace:*
         version: link:../adapters/robinhood

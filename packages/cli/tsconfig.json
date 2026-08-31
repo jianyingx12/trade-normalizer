@@ -7,7 +7,11 @@
     "tsBuildInfoFile": "dist/.tsbuildinfo",
     "types": ["node"]
   },
-  "references": [{ "path": "../core" }, { "path": "../adapters/robinhood" }],
+  "references": [
+    { "path": "../core" },
+    { "path": "../adapters/robinhood" },
+    { "path": "../adapters/ibkr" }
+  ],
   "include": ["src/**/*.ts"],
   "exclude": ["src/**/*.test.ts"]
 }

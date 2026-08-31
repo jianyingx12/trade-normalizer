@@ -1,6 +1,6 @@
 import { basename } from 'node:path';
 
-import type { BrokerActivity, Diagnostic } from '@trade-normalizer/core';
+import type { BrokerActivity, Diagnostic, Execution } from '@trade-normalizer/core';
 
 import { getBrokerAdapter, type SupportedBroker } from '../brokers/registry.js';
 import { BrokerAdapterError, BrokerInputError } from '../errors/operational-error.js';
@@ -23,6 +23,8 @@ export interface AdaptedBrokerSource {
   readonly broker: SupportedBroker;
   readonly sourceFile: string;
   readonly sourceRecordCount: number;
+  /** Empty for activity-only adapters; populated by execution-capable adapters. */
+  readonly executions: readonly Execution[];
   readonly activities: readonly BrokerActivity[];
   readonly diagnostics: readonly Diagnostic[];
 }
@@ -54,6 +56,7 @@ export function adaptBrokerSource(input: AdaptBrokerSourceInput): AdaptedBrokerS
     broker: adapter.broker,
     sourceFile: displayFile,
     sourceRecordCount: adapted.records.length,
+    executions: adapted.executions ?? [],
     activities: adapted.activities,
     diagnostics: adapted.diagnostics,
   };

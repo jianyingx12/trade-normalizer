@@ -1,15 +1,20 @@
+import { ibkrAdapter } from '@trade-normalizer/adapter-ibkr';
 import { robinhoodAdapter } from '@trade-normalizer/adapter-robinhood';
-import type { AdapterSourceContext, BrokerAdapterResult } from '@trade-normalizer/core';
+import type { AdapterSourceContext, BrokerAdapterResult, Execution } from '@trade-normalizer/core';
 
 import { UnsupportedBrokerError } from '../errors/operational-error.js';
 
-export const SUPPORTED_BROKERS = ['robinhood'] as const;
+export const SUPPORTED_BROKERS = ['robinhood', 'ibkr'] as const;
 export type SupportedBroker = (typeof SUPPORTED_BROKERS)[number];
+
+export interface RegisteredBrokerAdapterResult extends BrokerAdapterResult<unknown> {
+  readonly executions?: readonly Execution[];
+}
 
 export interface RegisteredBrokerAdapter {
   readonly broker: SupportedBroker;
   detect(source: string): boolean;
-  adapt(source: string, context: AdapterSourceContext): BrokerAdapterResult<unknown>;
+  adapt(source: string, context: AdapterSourceContext): RegisteredBrokerAdapterResult;
 }
 
 const registry: Readonly<Record<SupportedBroker, RegisteredBrokerAdapter>> = {
@@ -17,6 +22,11 @@ const registry: Readonly<Record<SupportedBroker, RegisteredBrokerAdapter>> = {
     broker: 'robinhood',
     detect: (source) => robinhoodAdapter.detect(source),
     adapt: (source, context) => robinhoodAdapter.adapt(source, context),
+  },
+  ibkr: {
+    broker: 'ibkr',
+    detect: (source) => ibkrAdapter.detect(source),
+    adapt: (source, context) => ibkrAdapter.adapt(source, context),
   },
 };
 

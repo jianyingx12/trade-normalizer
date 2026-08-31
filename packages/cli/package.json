@@ -23,6 +23,7 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
+    "@trade-normalizer/adapter-ibkr": "workspace:*",
     "@trade-normalizer/adapter-robinhood": "workspace:*",
     "@trade-normalizer/core": "workspace:*",
     "commander": "^15.0.0",
