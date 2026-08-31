@@ -1,4 +1,5 @@
 /docs
+/fixtures/private/
 node_modules/
 dist/
 coverage/
