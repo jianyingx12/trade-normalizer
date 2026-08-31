@@ -7,6 +7,7 @@ export interface InspectionReport extends ActivityCounts {
   readonly broker: SupportedBroker;
   readonly file: string;
   readonly sourceRecords: number;
+  readonly executions: number;
   readonly activities: number;
   readonly supportedRecords: number;
   readonly unsupportedRecords: number;

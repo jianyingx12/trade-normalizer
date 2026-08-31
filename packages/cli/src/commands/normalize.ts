@@ -49,7 +49,10 @@ export function registerNormalizeCommand(
     .command('normalize')
     .description('Normalize a supported broker CSV into canonical logical Trades')
     .argument('<input.csv>', 'UTF-8 broker CSV file')
-    .requiredOption('--broker <broker>', 'source broker (currently: robinhood)')
+    .requiredOption(
+      '--broker <broker>',
+      'source broker (robinhood activity or UTN IBKR Trade Confirmation Execution CSV v1)',
+    )
     .option('-o, --output <file>', 'write JSON to a file instead of stdout')
     .action((inputFile: string, options: NormalizeCommandOptions) =>
       runNormalizeCommand(inputFile, options, runtime),

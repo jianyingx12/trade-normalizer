@@ -24,6 +24,7 @@ export function inspectAdaptedSource(source: AdaptedBrokerSource): InspectionRep
     broker: source.broker,
     file: source.sourceFile,
     sourceRecords: source.sourceRecordCount,
+    executions: source.executions.length,
     activities: source.activities.length,
     supportedRecords: source.sourceRecordCount - unsupportedRecords,
     unsupportedRecords,

@@ -9,6 +9,7 @@ import { runInspectCommand } from './inspect.js';
 import { runValidateCommand } from './validate.js';
 
 const fixturePath = resolve('fixtures/robinhood/robinhood-equities-synthetic.csv');
+const ibkrFixturePath = resolve('fixtures/ibkr/ibkr-equities-executions-synthetic.csv');
 const headers =
   '"Activity Date","Process Date","Settle Date","Instrument","Description","Trans Code","Quantity","Price","Amount"';
 let temporaryDirectory: string;
@@ -36,11 +37,26 @@ describe('runInspectCommand', () => {
 
     expect(stdout).toContain('Broker: robinhood');
     expect(stdout).toContain('Records: 17');
+    expect(stdout).toContain('Executions: 0');
     expect(stdout).toContain('Activities: 17');
     expect(stdout).toContain('trade: 13');
     expect(stdout).toContain('Diagnostics: 0');
     expect(stdout).not.toContain('Trades:');
     expect(stdout).not.toContain('grossRealizedPnl');
+  });
+
+  it('reports retained execution evidence for the fixed IBKR profile', async () => {
+    let stdout = '';
+    await runInspectCommand(ibkrFixturePath, { broker: 'ibkr' }, (text) => {
+      stdout += text;
+    });
+
+    expect(stdout).toContain('Broker: ibkr');
+    expect(stdout).toContain('Records: 4');
+    expect(stdout).toContain('Executions: 4');
+    expect(stdout).toContain('Activities: 4');
+    expect(stdout).toContain('equity: 4');
+    expect(stdout).toContain('Diagnostics: 0');
   });
 
   it('supports deterministic JSON inspection with diagnostics and unsupported counts', async () => {
@@ -53,10 +69,12 @@ describe('runInspectCommand', () => {
       stdout += text;
     });
     const report = JSON.parse(stdout) as {
+      executions: number;
       unsupportedRecords: number;
       diagnostics: { code: string }[];
     };
 
+    expect(report.executions).toBe(0);
     expect(report.unsupportedRecords).toBe(1);
     expect(report.diagnostics).toMatchObject([{ code: 'UNKNOWN_TRANSACTION_TYPE' }]);
     expect(stdout).not.toContain(resolve('.'));
@@ -71,7 +89,18 @@ describe('runValidateCommand', () => {
     });
 
     expect(stdout).toBe(
-      'Valid: robinhood-equities-synthetic.csv (17 records, 17 activities, 0 warnings)\n',
+      'Valid: robinhood-equities-synthetic.csv (17 records, 0 executions, 17 activities, 0 warnings)\n',
+    );
+  });
+
+  it('validates IBKR executions and their activity projections', async () => {
+    let stdout = '';
+    await runValidateCommand(ibkrFixturePath, { broker: 'ibkr' }, (text) => {
+      stdout += text;
+    });
+
+    expect(stdout).toBe(
+      'Valid: ibkr-equities-executions-synthetic.csv (4 records, 4 executions, 4 activities, 0 warnings)\n',
     );
   });
 

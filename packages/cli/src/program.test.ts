@@ -6,6 +6,7 @@ import { runCli } from './program.js';
 import type { CliRuntime } from './runtime.js';
 
 const fixturePath = resolve('fixtures/robinhood/robinhood-equities-synthetic.csv');
+const ibkrFixturePath = resolve('fixtures/ibkr/ibkr-equities-executions-synthetic.csv');
 
 interface CapturedRun {
   readonly code: number;
@@ -71,6 +72,17 @@ describe('CLI command integration', () => {
       'Valid: robinhood-equities-synthetic.csv',
     ],
   ] as const)('runs the %s command successfully', async (_name, arguments_, expected) => {
+    const result = await run(arguments_);
+
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain(expected);
+    expect(result.stderr).toBe('');
+  });
+
+  it.each([
+    ['inspect', ['inspect', ibkrFixturePath, '--broker', 'ibkr'], 'Executions: 4'],
+    ['validate', ['validate', ibkrFixturePath, '--broker', 'ibkr'], '4 executions, 4 activities'],
+  ] as const)('runs IBKR %s through the CLI', async (_name, arguments_, expected) => {
     const result = await run(arguments_);
 
     expect(result.code).toBe(0);

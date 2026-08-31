@@ -20,7 +20,7 @@ export async function runValidateCommand(
   if (errors.length > 0) throw new ValidationFailedError(errors);
   const warnings = adapted.diagnostics.filter((diagnostic) => diagnostic.severity === 'warning');
   writeStdout(
-    `Valid: ${basename(inputFile)} (${adapted.sourceRecordCount} records, ${adapted.activities.length} activities, ${warnings.length} warnings)\n`,
+    `Valid: ${basename(inputFile)} (${adapted.sourceRecordCount} records, ${adapted.executions.length} executions, ${adapted.activities.length} activities, ${warnings.length} warnings)\n`,
   );
 }
 
@@ -32,7 +32,10 @@ export function registerValidateCommand(
     .command('validate')
     .description('Validate broker CSV parsing and canonical activity normalization')
     .argument('<input.csv>', 'UTF-8 broker CSV file')
-    .requiredOption('--broker <broker>', 'source broker (currently: robinhood)')
+    .requiredOption(
+      '--broker <broker>',
+      'source broker (robinhood activity or UTN IBKR Trade Confirmation Execution CSV v1)',
+    )
     .action((inputFile: string, options: ValidateCommandOptions) =>
       runValidateCommand(inputFile, options, runtime.writeStdout),
     );

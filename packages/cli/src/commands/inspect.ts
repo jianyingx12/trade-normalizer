@@ -27,7 +27,10 @@ export function registerInspectCommand(
     .command('inspect')
     .description('Inspect broker source and adaptation results without reconstructing Trades')
     .argument('<input.csv>', 'UTF-8 broker CSV file')
-    .requiredOption('--broker <broker>', 'source broker (currently: robinhood)')
+    .requiredOption(
+      '--broker <broker>',
+      'source broker (robinhood activity or UTN IBKR Trade Confirmation Execution CSV v1)',
+    )
     .option('--json', 'write the inspection report as JSON')
     .action((inputFile: string, options: InspectCommandOptions) =>
       runInspectCommand(inputFile, options, runtime.writeStdout),

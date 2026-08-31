@@ -6,6 +6,7 @@ export function formatInspection(report: InspectionReport): string {
     `Broker: ${report.broker}`,
     `File: ${report.file}`,
     `Records: ${report.sourceRecords}`,
+    `Executions: ${report.executions}`,
     `Activities: ${report.activities}`,
     `Supported records: ${report.supportedRecords}`,
     `Unsupported records: ${report.unsupportedRecords}`,
