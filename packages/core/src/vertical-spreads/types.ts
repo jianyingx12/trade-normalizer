@@ -1,4 +1,9 @@
-import type { Diagnostic, OptionInstrument, StrategyType } from '@trade-normalizer/schemas';
+import type {
+  BrokerActivity,
+  Diagnostic,
+  OptionInstrument,
+  StrategyType,
+} from '@trade-normalizer/schemas';
 import type { Decimal } from 'decimal.js';
 
 import type { OptionInstrumentKey } from '../option-instruments/index.js';
@@ -111,7 +116,7 @@ export interface VerticalSpreadMatchAllocation {
   readonly closingActivityId: string;
   readonly closedOn: string;
   readonly closedAt?: string;
-  readonly closingTimestampPrecision: 'date' | 'datetime';
+  readonly closingTimestampPrecision: BrokerActivity['timestampPrecision'];
   readonly closingSourceIndex: number;
   readonly closingCashFlow: Decimal;
   readonly grossRealizedPnl: Decimal;
@@ -122,7 +127,7 @@ export interface VerticalSpreadMatchAllocation {
 export interface VerticalSpreadLifecycleLeg extends VerticalSpreadLegAllocation {
   readonly openedOn: string;
   readonly openedAt?: string;
-  readonly openingTimestampPrecision: 'date' | 'datetime';
+  readonly openingTimestampPrecision: BrokerActivity['timestampPrecision'];
   readonly openingCashFlow: Decimal;
   readonly closedQuantity: Decimal;
   readonly openQuantity: Decimal;
@@ -153,7 +158,7 @@ export interface VerticalSpreadLifecycle {
   readonly openingTimestampPrecision: 'datetime';
   readonly lastClosedOn?: string;
   readonly lastClosedAt?: string;
-  readonly closingTimestampPrecision?: 'date' | 'datetime';
+  readonly closingTimestampPrecision?: BrokerActivity['timestampPrecision'];
   /** Premium cash flow only: inflows positive, outflows negative. */
   readonly openingNetCashFlow: Decimal;
   /** Premium cash flow from attributed Phase 6 closing matches. */

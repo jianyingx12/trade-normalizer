@@ -13,7 +13,7 @@ export const DEFAULT_DATETIME_GROUPING_WINDOW_MS = 0;
 interface CandidateLot extends VerticalSpreadCandidateLeg {
   readonly openedOn: string;
   readonly openedAt: string | undefined;
-  readonly timestampPrecision: 'date' | 'datetime';
+  readonly timestampPrecision: 'date' | 'local_datetime' | 'datetime';
   readonly lifecycle: OptionReconstructionResult['lifecycles'][number];
 }
 

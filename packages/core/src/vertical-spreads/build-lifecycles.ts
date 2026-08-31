@@ -1,5 +1,7 @@
 import { Decimal } from 'decimal.js';
 
+import type { BrokerActivity } from '@trade-normalizer/schemas';
+
 import type { OptionLotMatch, OptionReconstructionResult } from '../option-reconstruction/types.js';
 import { buildVerticalSpreadLifecycleLeg } from './build-lifecycle-leg.js';
 import type {
@@ -12,7 +14,7 @@ import type {
 interface ClosingEvidence {
   readonly closedOn: string;
   readonly closedAt?: string;
-  readonly precision: 'date' | 'datetime';
+  readonly precision: BrokerActivity['timestampPrecision'];
   readonly sourceIndex: number;
 }
 

@@ -1,5 +1,6 @@
 import { Decimal } from 'decimal.js';
 
+import { brokerActivityDateTime } from '../activity-time.js';
 import { calculateOptionPremium } from './premium.js';
 import type {
   EligibleOptionTradeActivity,
@@ -41,7 +42,7 @@ export function createOptionLifecycle(
     openingActivityId: activity.id,
     closingActivityId: undefined,
     openedOn: activity.activityDate,
-    openedAt: activity.timestamp,
+    openedAt: brokerActivityDateTime(activity),
     openingTimestampPrecision: activity.timestampPrecision,
     closedOn: undefined,
     closedAt: undefined,
@@ -64,7 +65,7 @@ export function closeOptionLifecycle(
   lifecycle.status = 'closed';
   lifecycle.closingActivityId = activity.id;
   lifecycle.closedOn = activity.activityDate;
-  lifecycle.closedAt = activity.timestamp;
+  lifecycle.closedAt = brokerActivityDateTime(activity);
   lifecycle.closingTimestampPrecision = activity.timestampPrecision;
 }
 

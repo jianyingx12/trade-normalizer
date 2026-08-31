@@ -112,6 +112,32 @@ describe('equity position lifecycles', () => {
     expect(dateOnly.openedAt).toBeUndefined();
   });
 
+  it('preserves local wall-clock timing through equity reconstruction', () => {
+    const result = replay([
+      {
+        id: 'buy',
+        localDateTime: '2026-08-01T09:30:01',
+        timestampPrecision: 'local_datetime',
+      },
+      {
+        id: 'sell',
+        side: 'sell',
+        localDateTime: '2026-08-02T15:59:45',
+        timestampPrecision: 'local_datetime',
+      },
+    ]);
+    const lifecycle = result.lifecycles[0]!;
+
+    expect(lifecycle).toMatchObject({
+      openedAt: '2026-08-01T09:30:01',
+      openingTimestampPrecision: 'local_datetime',
+      closedAt: '2026-08-02T15:59:45',
+      closingTimestampPrecision: 'local_datetime',
+    });
+    expect(lifecycle.lots[0]?.openedAt).toBe('2026-08-01T09:30:01');
+    expect(lifecycle.matches[0]?.closedAt).toBe('2026-08-02T15:59:45');
+  });
+
   it('starts a new lifecycle after a fully closed position is reopened', () => {
     const result = replay([
       { id: 'first-buy' },

@@ -1,6 +1,7 @@
 import { domainErrorSchema, type Diagnostic } from '@trade-normalizer/schemas';
 import { Decimal } from 'decimal.js';
 
+import { brokerActivityDateTime } from '../activity-time.js';
 import { allocateRemainingFee } from './fee-allocation.js';
 import {
   closeEquityLifecycle,
@@ -106,7 +107,7 @@ function addBuy(
     instrument: activity.instrument,
     openingActivityId: activity.id,
     openedOn: activity.activityDate,
-    openedAt: activity.timestamp,
+    openedAt: brokerActivityDateTime(activity),
     timestampPrecision: activity.timestampPrecision,
     originalQuantity: activity.quantity,
     remainingQuantity: activity.quantity,
@@ -125,6 +126,7 @@ function applySell(
   let quantityToMatch = activity.quantity;
   let remainingExitFees = activity.fees?.total;
   let matchIndex = position.matches.length;
+  const closingDateTime = brokerActivityDateTime(activity);
 
   for (const lot of position.lots) {
     if (quantityToMatch.isZero()) {
@@ -159,7 +161,7 @@ function applySell(
       openingActivityId: lot.openingActivityId,
       closingActivityId: activity.id,
       closedOn: activity.activityDate,
-      ...(activity.timestamp === undefined ? {} : { closedAt: activity.timestamp }),
+      ...(closingDateTime === undefined ? {} : { closedAt: closingDateTime }),
       closingTimestampPrecision: activity.timestampPrecision,
       closingSourceIndex: activity.provenance.sourceIndex,
       matchedQuantity,

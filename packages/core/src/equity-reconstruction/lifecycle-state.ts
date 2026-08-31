@@ -1,5 +1,6 @@
 import { Decimal } from 'decimal.js';
 
+import { brokerActivityDateTime } from '../activity-time.js';
 import type {
   EligibleEquityTradeActivity,
   EquityLot,
@@ -36,7 +37,7 @@ export function createEquityLifecycle(
     openingActivityId: activity.id,
     closingActivityId: undefined,
     openedOn: activity.activityDate,
-    openedAt: activity.timestamp,
+    openedAt: brokerActivityDateTime(activity),
     openingTimestampPrecision: activity.timestampPrecision,
     closedOn: undefined,
     closedAt: undefined,
@@ -59,7 +60,7 @@ export function closeEquityLifecycle(
   lifecycle.status = 'closed';
   lifecycle.closingActivityId = activity.id;
   lifecycle.closedOn = activity.activityDate;
-  lifecycle.closedAt = activity.timestamp;
+  lifecycle.closedAt = brokerActivityDateTime(activity);
   lifecycle.closingTimestampPrecision = activity.timestampPrecision;
 }
 

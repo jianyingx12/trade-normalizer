@@ -51,6 +51,21 @@ describe('broker activity schema', () => {
     expect(activity.timestamp).toBe('2026-08-03T14:31:00.000Z');
   });
 
+  it('preserves a timezone-less local datetime without fabricating UTC', () => {
+    const activity = brokerActivitySchema.parse({
+      id: 'activity_local_datetime',
+      broker: 'ibkr',
+      activityType: 'trade',
+      activityDate: '2026-08-03',
+      localDateTime: '2026-08-03T09:31:15',
+      timestampPrecision: 'local_datetime',
+      provenance,
+    });
+
+    expect(activity.localDateTime).toBe('2026-08-03T09:31:15');
+    expect(activity.timestamp).toBeUndefined();
+  });
+
   it('preserves trade currency and commission evidence without complete fees', () => {
     const activity = brokerActivitySchema.parse({
       id: 'activity_commission',
@@ -208,6 +223,26 @@ describe('broker activity schema', () => {
     [
       'datetime precision without a timestamp',
       { activityDate: '2026-08-03', timestampPrecision: 'datetime' },
+    ],
+    [
+      'local datetime precision without a local value',
+      { activityDate: '2026-08-03', timestampPrecision: 'local_datetime' },
+    ],
+    [
+      'local datetime precision with UTC text',
+      {
+        activityDate: '2026-08-03',
+        timestampPrecision: 'local_datetime',
+        localDateTime: '2026-08-03T09:31:15Z',
+      },
+    ],
+    [
+      'date precision with a local datetime',
+      {
+        activityDate: '2026-08-03',
+        timestampPrecision: 'date',
+        localDateTime: '2026-08-03T09:31:15',
+      },
     ],
     ['an invalid activity date', { activityDate: '2026-02-30', timestampPrecision: 'date' }],
     [
