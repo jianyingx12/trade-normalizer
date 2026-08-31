@@ -36,7 +36,8 @@ describe('runNormalizeCommand', () => {
     await runNormalizeCommand(copiedInput, { broker: 'robinhood' }, io);
     const parsed = JSON.parse(stdout) as Record<string, unknown>;
 
-    expect(parsed.schemaVersion).toBe('1');
+    expect(parsed.schemaVersion).toBe('2');
+    expect(parsed.summary).toMatchObject({ executions: 0 });
     expect((parsed.summary as { trades: number }).trades).toBe(4);
     expect(stdout).not.toContain('Decimal');
     expect(stdout).not.toContain(resolve('.'));
@@ -64,7 +65,10 @@ describe('runNormalizeCommand', () => {
 
     const contents = await readFile(outputFile, 'utf8');
     const files = await readdir(temporaryDirectory);
-    expect(JSON.parse(contents)).toMatchObject({ schemaVersion: '1', summary: { trades: 4 } });
+    expect(JSON.parse(contents)).toMatchObject({
+      schemaVersion: '2',
+      summary: { executions: 0, trades: 4 },
+    });
     expect(stdout).toBe('');
     expect(files.some((file) => file.endsWith('.tmp'))).toBe(false);
   });

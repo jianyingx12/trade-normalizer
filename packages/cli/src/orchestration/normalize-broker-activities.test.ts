@@ -69,10 +69,11 @@ describe('normalizeBrokerActivities', () => {
       diagnostics: [diagnostic],
     });
 
-    expect(result.schemaVersion).toBe('1');
+    expect(result.schemaVersion).toBe('2');
     expect(result.source).toEqual({ broker: 'test-broker', file: 'input.csv' });
     expect(result.summary).toMatchObject({
       sourceRecords: 3,
+      executions: 0,
       activities: 3,
       trades: 1,
       diagnostics: 1,

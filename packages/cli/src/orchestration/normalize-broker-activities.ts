@@ -50,6 +50,7 @@ function summarize(
 
   return {
     sourceRecords: input.sourceRecordCount,
+    executions: input.executionCount ?? 0,
     activities: input.activities.length,
     trades: trades.length,
     diagnostics: diagnostics.length,

@@ -25,6 +25,7 @@ describe('normalizeBrokerFile', () => {
     });
     expect(result.summary).toMatchObject({
       sourceRecords: 17,
+      executions: 0,
       activities: 17,
       trades: 4,
       activityTypes: { trade: 13, dividend: 1, deposit: 1, fee: 1, split: 1 },
@@ -73,7 +74,12 @@ describe('normalizeBrokerSource', () => {
       broker: 'ibkr',
       file: 'ibkr-equities-executions-synthetic.csv',
     });
-    expect(result.summary).toMatchObject({ sourceRecords: 4, activities: 4, trades: 2 });
+    expect(result.summary).toMatchObject({
+      sourceRecords: 4,
+      executions: 4,
+      activities: 4,
+      trades: 2,
+    });
     expect(
       result.trades
         .map((trade) => [trade.underlying, trade.status])

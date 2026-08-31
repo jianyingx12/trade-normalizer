@@ -41,7 +41,7 @@ describe('CLI command integration', () => {
 
     expect(result.code).toBe(0);
     expect(result.stderr).toBe('');
-    expect(document.schemaVersion).toBe('1');
+    expect(document.schemaVersion).toBe('2');
     expect(document.trades).toHaveLength(4);
   });
 
@@ -59,8 +59,8 @@ describe('CLI command integration', () => {
     expect(result.stdout).toBe('');
     expect(result.stderr).toBe('');
     expect(JSON.parse(result.files['normalized.json']!)).toMatchObject({
-      schemaVersion: '1',
-      summary: { trades: 4 },
+      schemaVersion: '2',
+      summary: { executions: 0, trades: 4 },
     });
   });
 

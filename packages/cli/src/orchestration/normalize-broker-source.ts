@@ -17,6 +17,7 @@ export function normalizeBrokerSource(input: NormalizeBrokerSourceInput): Normal
     broker: adapted.broker,
     sourceFile: adapted.sourceFile,
     sourceRecordCount: adapted.sourceRecordCount,
+    executionCount: adapted.executions.length,
     activities: adapted.activities,
     diagnostics: adapted.diagnostics,
   });
@@ -27,5 +28,8 @@ export async function normalizeBrokerFile(
   input: NormalizeBrokerFileInput,
 ): Promise<NormalizationEnvelope> {
   const adapted = await adaptBrokerFile(input);
-  return normalizeBrokerActivities(adapted);
+  return normalizeBrokerActivities({
+    ...adapted,
+    executionCount: adapted.executions.length,
+  });
 }

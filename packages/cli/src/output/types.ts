@@ -6,7 +6,7 @@ import type {
   Trade,
 } from '@trade-normalizer/core';
 
-export const NORMALIZATION_SCHEMA_VERSION = '1' as const;
+export const NORMALIZATION_SCHEMA_VERSION = '2' as const;
 
 export interface NormalizationSource {
   readonly broker: BrokerId;
@@ -16,6 +16,7 @@ export interface NormalizationSource {
 
 export interface NormalizationSummary {
   readonly sourceRecords: number;
+  readonly executions: number;
   readonly activities: number;
   readonly trades: number;
   readonly diagnostics: number;
@@ -35,6 +36,8 @@ export interface NormalizeBrokerActivitiesInput {
   readonly broker: BrokerId;
   readonly sourceFile: string;
   readonly sourceRecordCount: number;
+  /** Confirmed execution evidence retained by an execution-capable source adapter. */
+  readonly executionCount?: number;
   readonly activities: readonly BrokerActivity[];
   readonly diagnostics?: readonly Diagnostic[];
 }
