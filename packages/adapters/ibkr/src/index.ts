@@ -1,5 +1,4 @@
-import type { BrokerAdapterDescriptor } from '@trade-normalizer/core';
-
+export { adaptIbkrTradeConfirmationExecutionCsv, ibkrAdapter } from './adapter.js';
 export {
   IBKR_TRADE_CONFIRMATION_EXECUTION_HEADERS,
   hasExactIbkrTradeConfirmationExecutionHeaders,
@@ -9,8 +8,4 @@ export { parseIbkrTradeConfirmationExecutionCsv } from './parsing/parse-ibkr-csv
 export type { IbkrTradeConfirmationExecutionRecord } from './parsing/ibkr-record.js';
 export { normalizeIbkrExecutionRecord } from './normalization/normalize-ibkr-record.js';
 export type { IbkrRecordNormalizationResult } from './normalization/normalize-ibkr-record.js';
-
-export const ibkrAdapter: BrokerAdapterDescriptor = {
-  broker: 'ibkr',
-  packageName: '@trade-normalizer/adapter-ibkr',
-};
+export { normalizeIbkrExecutionRecords } from './normalization/normalize-ibkr-records.js';
