@@ -5,6 +5,8 @@
     "declarationMap": false,
     "noEmit": true,
     "paths": {
+      "@trade-normalizer/adapter-ibkr": ["./packages/adapters/ibkr/src/index.ts"],
+      "@trade-normalizer/adapter-robinhood": ["./packages/adapters/robinhood/src/index.ts"],
       "@trade-normalizer/core": ["./packages/core/src/index.ts"],
       "@trade-normalizer/schemas": ["./packages/schemas/src/index.ts"]
     },
