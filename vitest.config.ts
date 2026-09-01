@@ -18,6 +18,8 @@ export default defineConfig({
   },
   test: {
     coverage: {
+      exclude: ['**/*.test.ts'],
+      include: ['packages/*/src/**/*.ts', 'packages/adapters/*/src/**/*.ts'],
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
     },
