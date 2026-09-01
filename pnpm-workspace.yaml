@@ -2,3 +2,10 @@ packages:
   - apps/*
   - packages/*
   - packages/adapters/*
+
+# CI installs the pinned version explicitly; do not self-download pnpm before scripts.
+pmOnFail: ignore
+
+# Keep the workspace layout consistent across pnpm upgrades and never install implicitly on run.
+enableGlobalVirtualStore: false
+verifyDepsBeforeRun: error
