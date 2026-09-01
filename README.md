@@ -62,6 +62,47 @@ IBKR Flex Query exports are customizable. This project intentionally supports on
 profile rather than claiming arbitrary IBKR CSV compatibility. Current broker adapters import
 equities only; the canonical engine's option capabilities are documented separately below.
 
+## Same economics, different broker evidence
+
+These abbreviated synthetic excerpts represent the same AAPL lifecycle in the committed
+cross-broker fixtures. They are illustrative excerpts, not complete official export formats.
+
+```text
+Robinhood activity
+8/3/2026   AAPL   Buy    10   $100.00
+8/4/2026   AAPL   Buy     5   $110.00
+8/10/2026  AAPL   Sell    6   $120.00
+8/11/2026  AAPL   Sell    9   $125.00
+
+IBKR executions
+20260803;093000  AAPL  BUY    10   100.00  ExecID=E-EQ-1
+20260804;101500  AAPL  BUY     5   110.00  ExecID=E-EQ-2
+20260810;140000  AAPL  SELL   -6   120.00  ExecID=E-EQ-3
+20260811;150000  AAPL  SELL   -9   125.00  ExecID=E-EQ-4
+```
+
+Both normalize into the same canonical economics while retaining different broker provenance:
+
+```json
+{
+  "underlying": "AAPL",
+  "assetType": "equity",
+  "strategy": "equity_long",
+  "status": "closed",
+  "grossRealizedPnl": "295"
+}
+```
+
+## Why this isn't just a CSV parser
+
+- Robinhood provides date-level account activity; IBKR provides execution-level evidence.
+- FIFO reconstruction must preserve lots across multiple entries, partial fills, and partial exits.
+- Option identity includes underlying, expiration, strike, call/put, and an explicit multiplier.
+- Long and short option accounting have opposite cash-flow direction and closure behavior.
+- Vertical spreads require quantity ownership across legs, not simple ticker or lifecycle grouping.
+- Ambiguous strategies remain ungrouped with diagnostics instead of being force-classified.
+- Stable IDs, duplicate handling, and timestamp precision must remain deterministic across runs.
+
 ## Engineering characteristics
 
 - Exact Decimal arithmetic for quantities, prices, fees, and P&L
@@ -124,20 +165,16 @@ console.log(result.trades);
 `normalizeBrokerFile` provides the asynchronous local-file equivalent. Advanced consumers can use
 the lower-level schemas, adapters, reconstruction stages, and Trade builder directly.
 
-## Reconstruction and strategy capabilities
+## Reconstruction engine
 
-The core supports these canonical strategy classifications:
-
-- `equity_long`
-- `long_call`
-- `long_put`
-- `short_call`
-- `short_put`
-- `bull_call_spread`
-- `bear_call_spread`
-- `bull_put_spread`
-- `bear_put_spread`
-- `unknown`
+| Capability                              | Supported |
+| --------------------------------------- | --------: |
+| Long equities and FIFO partial exits    |       Yes |
+| Long calls and puts                     |       Yes |
+| Short calls and puts                    |       Yes |
+| Bull and bear call spreads              |       Yes |
+| Bull and bear put spreads               |       Yes |
+| Ambiguity-safe partial spread ownership |       Yes |
 
 Equities use deterministic long-only FIFO lots, including fractional quantities, multiple entries,
 partial closes, repeated lifecycles, and structured oversell diagnostics.
@@ -147,8 +184,23 @@ multiplier. Long and short positions reconstruct independently. Vertical-spread 
 ownership conservatively and leaves partial or ambiguous ownership ungrouped rather than assigning
 the same quantity twice.
 
+For example, normalized contract activity can open and later close two legs:
+
+```text
+BUY  1 NVDA 2026-09-18 180C
+SELL 1 NVDA 2026-09-18 185C
+
+SELL 1 NVDA 2026-09-18 180C
+BUY  1 NVDA 2026-09-18 185C
+```
+
+With sufficient structural and confirmed-timing evidence, the engine assigns the leg quantities to
+one `bull_call_spread` lifecycle. If multiple pairings are equally plausible, it leaves the legs
+ungrouped and emits `AMBIGUOUS_STRATEGY_MATCH` rather than claiming trader intent.
+
 These core option capabilities do not imply broker-imported option support. No current broker
-adapter parses option rows.
+adapter parses option rows; option reconstruction currently begins with canonical option activity
+provided programmatically.
 
 ## Correctness policies
 
