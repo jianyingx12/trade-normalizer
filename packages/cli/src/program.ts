@@ -9,7 +9,7 @@ export function createProgram(runtime: CliRuntime = processCliRuntime): Command 
   const program = new Command()
     .name('trade-normalizer')
     .description('Normalize broker exports into canonical trade data')
-    .version('0.0.0')
+    .version('0.1.0')
     .showHelpAfterError()
     .configureOutput({ writeOut: runtime.writeStdout, writeErr: runtime.writeStderr })
     .exitOverride();

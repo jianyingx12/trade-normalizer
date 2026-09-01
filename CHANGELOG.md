@@ -6,6 +6,8 @@ release yet.
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-08-31
+
 ### Added
 
 - Canonical runtime schemas for broker activities, executions, instruments, fees, diagnostics, and

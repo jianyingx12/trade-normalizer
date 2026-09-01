@@ -1,6 +1,6 @@
 {
   "name": "@trade-normalizer/core",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Broker-independent Trade Normalizer engine",
   "license": "MIT",
   "type": "module",

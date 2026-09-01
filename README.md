@@ -304,6 +304,6 @@ or validation failure; `2` means invalid command usage.
   input
 - No market data, currency conversion, tax reporting, persistence, API server, or web UI
 
-See [CHANGELOG.md](CHANGELOG.md) for the current unreleased capabilities and
-[RELEASE_NOTES.md](RELEASE_NOTES.md) for the proposed first public release. Contributions are
-welcome under the [MIT License](LICENSE).
+See [CHANGELOG.md](CHANGELOG.md) for the project history and
+[RELEASE_NOTES.md](RELEASE_NOTES.md) for the first public release. Contributions are welcome under
+the [MIT License](LICENSE).

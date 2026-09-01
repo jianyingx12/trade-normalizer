@@ -1,6 +1,6 @@
 {
   "name": "@trade-normalizer/schemas",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Canonical runtime schemas and shared types for Trade Normalizer",
   "license": "MIT",
   "type": "module",

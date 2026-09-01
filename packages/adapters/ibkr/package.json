@@ -1,6 +1,6 @@
 {
   "name": "@trade-normalizer/adapter-ibkr",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Fixed-profile IBKR equity execution adapter for Trade Normalizer",
   "license": "MIT",
   "type": "module",

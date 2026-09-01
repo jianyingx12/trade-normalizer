@@ -1,11 +1,8 @@
-# Universal Trade Normalizer 0.1.0 — Draft Release Notes
+# Universal Trade Normalizer 0.1.0
 
-> Draft only. Version `0.1.0` has not been published or applied to package manifests.
-
-`0.1.0` is the proposed first public version. It communicates that the project has a usable,
-tested workflow while its broker coverage and lifecycle support remain intentionally narrower than
-a stable `1.0.0` contract. All publishable workspace packages currently remain at `0.0.0`; they
-should be updated together only as part of an intentional release.
+`0.1.0` is the first public release version. It communicates that the project has a usable, tested
+workflow while its broker coverage and lifecycle support remain intentionally narrower than a
+stable `1.0.0` contract.
 
 ## Highlights
 
@@ -56,8 +53,8 @@ variables.
 
 ## Suggested GitHub metadata
 
-**Description:** Broker-agnostic TypeScript engine that normalizes brokerage exports and
-reconstructs logical equity and options trades.
+**Description:** Turns messy brokerage exports into consistent trade histories with support for
+partial fills, FIFO positions, and options spreads.
 
 **Topics:** `typescript`, `fintech`, `trading`, `options`, `brokerage`, `csv`, `financial-data`,
 `open-source`

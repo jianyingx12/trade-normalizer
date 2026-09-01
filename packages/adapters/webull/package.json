@@ -1,6 +1,6 @@
 {
   "name": "@trade-normalizer/adapter-webull",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "Reserved, unimplemented Webull adapter boundary for Trade Normalizer",
   "license": "MIT",
