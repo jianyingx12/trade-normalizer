@@ -17,8 +17,10 @@ pnpm install --frozen-lockfile
 pnpm check
 ```
 
-Useful individual commands are `pnpm format`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, and
-`pnpm build`.
+Useful individual commands are `pnpm format`, `pnpm lint`, `pnpm typecheck`, `pnpm test`,
+`pnpm test:coverage`, and `pnpm build`. Run `pnpm audit:prod` when reviewing dependency changes;
+it queries the configured package registry and is intentionally separate from the offline-capable
+quality gate.
 
 ## Repository layout
 

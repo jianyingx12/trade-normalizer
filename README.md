@@ -216,18 +216,20 @@ pnpm build
 pnpm check
 ```
 
-| Command             | Purpose                                                   |
-| ------------------- | --------------------------------------------------------- |
-| `pnpm build`        | Build TypeScript projects using project references        |
-| `pnpm cli`          | Run the compiled CLI after building                       |
-| `pnpm clean`        | Remove TypeScript build outputs                           |
-| `pnpm format`       | Format supported files with Prettier                      |
-| `pnpm format:check` | Verify formatting                                         |
-| `pnpm lint`         | Run ESLint with zero warnings allowed                     |
-| `pnpm typecheck`    | Type-check the complete workspace without emitting files  |
-| `pnpm test`         | Run the Vitest suite once                                 |
-| `pnpm test:watch`   | Run Vitest in watch mode                                  |
-| `pnpm check`        | Run formatting, linting, type-checking, tests, and builds |
+| Command              | Purpose                                                   |
+| -------------------- | --------------------------------------------------------- |
+| `pnpm audit:prod`    | Query the registry for production dependency advisories   |
+| `pnpm build`         | Build TypeScript projects using project references        |
+| `pnpm cli`           | Run the compiled CLI after building                       |
+| `pnpm clean`         | Remove TypeScript build outputs                           |
+| `pnpm format`        | Format supported files with Prettier                      |
+| `pnpm format:check`  | Verify formatting                                         |
+| `pnpm lint`          | Run ESLint with zero warnings allowed                     |
+| `pnpm typecheck`     | Type-check the complete workspace without emitting files  |
+| `pnpm test`          | Run the Vitest suite once                                 |
+| `pnpm test:coverage` | Generate an all-source coverage report                    |
+| `pnpm test:watch`    | Run Vitest in watch mode                                  |
+| `pnpm check`         | Run formatting, linting, type-checking, tests, and builds |
 
 Successful normalization writes no logs or ANSI formatting into stdout JSON. Operational errors
 use stderr. Exit code `0` means success, including usable warning results; `1` means an operational
