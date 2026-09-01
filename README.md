@@ -21,12 +21,19 @@ Requirements: Node.js 22 or newer and pnpm 11.
 
 ```bash
 pnpm install
+pnpm demo
+```
+
+The demo builds the workspace, normalizes committed synthetic Robinhood data, and prints canonical
+JSON. It requires no brokerage account, environment variables, or network access after install.
+The equivalent explicit CLI command is:
+
+```bash
 pnpm build
 pnpm cli normalize fixtures/robinhood/robinhood-equities-synthetic.csv --broker robinhood
 ```
 
-The command uses committed synthetic data and prints canonical JSON without requiring a brokerage
-account, environment variables, or network access. IBKR works through the same interface:
+IBKR works through the same interface:
 
 ```bash
 pnpm cli normalize fixtures/ibkr/ibkr-equities-executions-synthetic.csv --broker ibkr
@@ -202,10 +209,16 @@ These core option capabilities do not imply broker-imported option support. No c
 adapter parses option rows; option reconstruction currently begins with canonical option activity
 provided programmatically.
 
-## Correctness policies
+## Trust and correctness
+
+The repository currently has 441 automated tests, including generated invariant checks, large
+history tests, malformed-input cases, golden output tests, and equivalent Robinhood/IBKR lifecycle
+tests. The important policies are:
 
 - **Decimal arithmetic:** quantities, prices, strikes, fees, and P&L use `decimal.js`, not binary
   floating point.
+- **Conservation checks:** generated histories verify quantity, P&L, and option ownership are neither
+  lost nor counted twice.
 - **Missing fees:** absent fee evidence remains unknown. Reported IBKR commission is preserved
   separately and is not assumed to be a complete fee breakdown.
 - **Time precision:** date-only values remain dates. Timezone-less IBKR datetimes remain local
@@ -214,7 +227,24 @@ provided programmatically.
 - **Determinism:** source ordering, FIFO allocation, identifiers, diagnostics, and JSON serialization
   are stable for the same evidence.
 - **Ambiguity safety:** uncertain option ownership is reported rather than force-classified.
+- **Duplicate handling:** repeated IBKR execution IDs are detected; conflicting duplicates fail
+  normalization instead of silently selecting a record.
 - **Source isolation:** broker-specific columns and meanings do not leak into core reconstruction.
+
+## Measured performance
+
+The standalone benchmark uses deterministic, in-memory inputs and reports seven-sample medians. A
+local observation on Node.js 22.17.0, Windows x64, and an Intel Core i5-10210U measured:
+
+| Path                                     | Approximate median |
+| ---------------------------------------- | -----------------: |
+| Equity reconstruction, 10,000 activities |         922.737 ms |
+| Option reconstruction, 2,000 activities  |          58.941 ms |
+| Full synthetic broker normalization      |     1.1–1.4 ms/run |
+
+These are environment-specific observations, not latency guarantees. Run `pnpm build` followed by
+`pnpm benchmark` to measure the current checkout; methodology and the full result set are in
+[benchmarks/README.md](benchmarks/README.md).
 
 ## Local and private by design
 
@@ -248,6 +278,7 @@ pnpm check
 | `pnpm build`         | Build TypeScript projects using project references        |
 | `pnpm cli`           | Run the compiled CLI after building                       |
 | `pnpm clean`         | Remove TypeScript build outputs                           |
+| `pnpm demo`          | Build and normalize a committed synthetic Robinhood file  |
 | `pnpm format`        | Format supported files with Prettier                      |
 | `pnpm format:check`  | Verify formatting                                         |
 | `pnpm lint`          | Run ESLint with zero warnings allowed                     |

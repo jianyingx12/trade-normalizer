@@ -15,6 +15,7 @@
     "build": "tsc -b",
     "cli": "node packages/cli/dist/index.js",
     "clean": "tsc -b --clean",
+    "demo": "pnpm build && pnpm example:robinhood",
     "example:ibkr": "node examples/normalize-broker-file.mjs ibkr fixtures/ibkr/ibkr-equities-executions-synthetic.csv",
     "example:memory": "node examples/normalize-in-memory.mjs",
     "example:robinhood": "node examples/normalize-broker-file.mjs robinhood fixtures/robinhood/robinhood-equities-synthetic.csv",
