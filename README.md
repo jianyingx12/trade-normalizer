@@ -1,54 +1,56 @@
 # Universal Trade Normalizer
 
-Universal Trade Normalizer converts inconsistent broker exports into deterministic logical trades.
-It is a local TypeScript library and CLI built for the accounting problem behind trade history—not
-just CSV parsing.
+**Universal Trade Normalizer converts inconsistent brokerage exports into deterministic logical
+trades.**
 
-Broker files usually describe fills or account activity. Users reason about positions, complete
-trade lifecycles, and strategies:
+Broker files describe account activity or individual executions. They do not directly describe the
+positions and complete trade lifecycles people actually reason about. This local TypeScript engine
+handles that stateful transformation:
 
 ```text
-fills / account activity
-→ positions
-→ logical trades
-→ strategies
+broker activity / executions → positions → logical trades → option strategies
 ```
 
-Reaching that result requires precise arithmetic, FIFO ownership, partial-close handling,
-deterministic ordering, truthful date/time semantics, and conservative strategy matching. The
-normalizer keeps ambiguous or missing evidence explicit instead of inventing certainty.
+It combines broker adapters, Decimal-safe accounting, FIFO lot reconstruction, stable identities,
+and ambiguity-safe option ownership. Missing evidence stays missing: the engine does not invent
+fees, timestamps, executions, or strategy intent.
 
 ## Quick start
 
 Requirements: Node.js 22 or newer and pnpm 11.
 
 ```bash
-pnpm install --frozen-lockfile
+pnpm install
 pnpm build
-
-pnpm cli normalize trades.csv --broker robinhood
-pnpm cli normalize trades.csv --broker ibkr
+pnpm cli normalize fixtures/robinhood/robinhood-equities-synthetic.csv --broker robinhood
 ```
 
-The installed-package command uses the same interface:
+The command uses committed synthetic data and prints canonical JSON without requiring a brokerage
+account, environment variables, or network access. IBKR works through the same interface:
 
 ```bash
-trade-normalizer normalize trades.csv --broker robinhood
-trade-normalizer normalize trades.csv --broker ibkr --output normalized.json
-trade-normalizer inspect trades.csv --broker ibkr
-trade-normalizer validate trades.csv --broker ibkr
+pnpm cli normalize fixtures/ibkr/ibkr-equities-executions-synthetic.csv --broker ibkr
 ```
 
-`normalize` writes JSON to stdout unless `--output` is provided. `inspect` reports source and
-adapter facts without reconstructing Trades. `validate` checks file readability, the selected
-broker profile, CSV parsing, and canonical normalization.
+An abridged canonical Trade looks like this. Financial values serialize as decimal strings:
 
-## What works today
+```json
+{
+  "broker": "ibkr",
+  "underlying": "AAPL",
+  "assetType": "equity",
+  "strategy": "equity_long",
+  "status": "partially_closed",
+  "grossRealizedPnl": "44.52"
+}
+```
 
-| Broker    | Supported input                              | Equities | Options |
-| --------- | -------------------------------------------- | -------- | ------- |
-| Robinhood | Supported account-activity CSV profile       | Yes      | No      |
-| IBKR      | UTN IBKR Trade Confirmation Execution CSV v1 | Yes      | No      |
+## Supported inputs
+
+| Broker profile                               | Equities | Options | Source evidence  |
+| -------------------------------------------- | -------: | ------: | ---------------- |
+| Robinhood supported account-activity profile |      Yes |      No | Account activity |
+| IBKR UTN Trade Confirmation Execution CSV v1 |      Yes |      No | Execution-level  |
 
 Broker selection is explicit; automatic detection is not enabled.
 
@@ -57,60 +59,32 @@ without pretending each row is a confirmed execution. The IBKR profile has execu
 evidence, so each valid row emits a canonical `Execution` and one linked `BrokerActivity`.
 
 IBKR Flex Query exports are customizable. This project intentionally supports one exact 24-column
-profile rather than claiming generic IBKR CSV compatibility. Robinhood options, IBKR options,
-Webull, and unobserved variants of the supported profiles are not implemented.
+profile rather than claiming arbitrary IBKR CSV compatibility. Current broker adapters import
+equities only; the canonical engine's option capabilities are documented separately below.
 
-## Output
+## Engineering characteristics
 
-The current normalization envelope uses `schemaVersion: "2"`. This abridged example shows its
-public shape:
-
-```json
-{
-  "schemaVersion": "2",
-  "source": {
-    "broker": "ibkr",
-    "file": "trades.csv"
-  },
-  "summary": {
-    "sourceRecords": 4,
-    "executions": 4,
-    "activities": 4,
-    "trades": 2,
-    "diagnostics": 0
-  },
-  "trades": [
-    {
-      "broker": "ibkr",
-      "underlying": "AAPL",
-      "assetType": "equity",
-      "strategy": "equity_long",
-      "status": "partially_closed",
-      "grossRealizedPnl": "44.52"
-    }
-  ],
-  "diagnostics": []
-}
-```
-
-The complete envelope also contains activity/asset counts and fully validated Trade legs and
-identities. Decimal quantities and financial values serialize as strings. Output ordering, IDs,
-and diagnostics are deterministic for identical input.
+- Exact Decimal arithmetic for quantities, prices, fees, and P&L
+- Deterministic FIFO reconstruction, IDs, diagnostics, ordering, and JSON
+- Runtime validation through canonical Zod schemas
+- Conservative option ownership that reports ambiguity instead of guessing
+- Local-only operation with no telemetry, credentials, database, or external services
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-  RH[Robinhood activity CSV] --> BA[BrokerActivity]
-  IBKR[IBKR execution CSV] --> EX[Execution]
+  RH[Robinhood Activity CSV] --> BA[BrokerActivity]
+  IB[IBKR Execution CSV] --> EX[Execution]
   EX --> BA
-  BA --> ER[Equity FIFO reconstruction]
-  COA[Canonical option activity] --> OR[Option reconstruction]
-  OR --> VS[Vertical spread reconstruction]
-  ER --> CT[Canonical logical Trades]
-  OR --> CT
+  CA[Canonical Option Activity] -. programmatic input .-> BA
+  BA --> EQ[Equity FIFO Reconstruction]
+  BA --> OP[Option Reconstruction]
+  OP --> VS[Vertical Spread Ownership]
+  EQ --> CT[Canonical Trades]
+  OP --> CT
   VS --> CT
-  CT --> OUT[CLI / programmatic output]
+  CT --> API[CLI / Programmatic API]
 ```
 
 Broker adapters stop at canonical evidence. The broker-independent core owns FIFO reconstruction,
