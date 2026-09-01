@@ -172,8 +172,18 @@ describe('CLI command integration', () => {
 
     expect(result.code).toBe(1);
     expect(result.stdout).toBe('');
-    expect(result.stderr).toContain(
-      'IBKR Trade Confirmation CSV headers do not match the required UTN execution profile',
+    expect(result.stderr).toBe(
+      'Error: Unsupported IBKR input profile. Expected: UTN IBKR Trade Confirmation Execution CSV v1.\n',
+    );
+  });
+
+  it('rejects a CSV outside the supported Robinhood profile', async () => {
+    const result = await run(['normalize', unsupportedIbkrProfilePath, '--broker', 'robinhood']);
+
+    expect(result.code).toBe(1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toBe(
+      'Error: Unsupported Robinhood input profile. Expected: supported account-activity CSV headers.\n',
     );
   });
 
@@ -201,7 +211,37 @@ describe('CLI command integration', () => {
 
     expect(result.code).toBe(1);
     expect(result.stdout).toBe('');
-    expect(result.stderr).toContain('Unable to read input file');
+    expect(result.stderr).toBe('Error: Unable to read input file: missing.csv\n');
+    expect(result.stderr).not.toContain('at ');
+  });
+
+  it('suppresses stack traces for unexpected operational failures', async () => {
+    let stderr = '';
+    const code = await runCli(
+      [
+        'node',
+        'trade-normalizer',
+        'normalize',
+        fixturePath,
+        '--broker',
+        'robinhood',
+        '--output',
+        'failure.json',
+      ],
+      {
+        writeStdout: () => undefined,
+        writeStderr: (contents) => {
+          stderr += contents;
+        },
+        writeOutputFile: async () => {
+          throw new Error('Synthetic disk failure.');
+        },
+      },
+    );
+
+    expect(code).toBe(1);
+    expect(stderr).toBe('Error: Synthetic disk failure.\n');
+    expect(stderr).not.toContain('at ');
   });
 
   it('uses exit code 2 for invalid command usage', async () => {

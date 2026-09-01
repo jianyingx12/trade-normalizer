@@ -50,7 +50,7 @@ export function parseIbkrTradeConfirmationExecutionCsv(
         createIbkrAdapterError({
           code: 'INVALID_CSV_HEADERS',
           message:
-            'IBKR Trade Confirmation CSV headers do not match the required UTN execution profile.',
+            'Unsupported IBKR input profile. Expected: UTN IBKR Trade Confirmation Execution CSV v1.',
           details: {
             expected: [...expected],
             actual: headers,

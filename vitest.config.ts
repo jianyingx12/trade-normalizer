@@ -8,6 +8,9 @@ export default defineConfig({
       '@trade-normalizer/core': fileURLToPath(
         new URL('./packages/core/src/index.ts', import.meta.url),
       ),
+      '@trade-normalizer/adapter-ibkr': fileURLToPath(
+        new URL('./packages/adapters/ibkr/src/index.ts', import.meta.url),
+      ),
       '@trade-normalizer/adapter-robinhood': fileURLToPath(
         new URL('./packages/adapters/robinhood/src/index.ts', import.meta.url),
       ),

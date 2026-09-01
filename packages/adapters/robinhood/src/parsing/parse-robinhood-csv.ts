@@ -50,7 +50,8 @@ export function parseRobinhoodActivityCsv(
       diagnostics: [
         createAdapterError({
           code: 'INVALID_CSV_HEADERS',
-          message: 'Robinhood activity CSV headers do not match the required observed format.',
+          message:
+            'Unsupported Robinhood input profile. Expected: supported account-activity CSV headers.',
           details: {
             expected: [...ROBINHOOD_ACTIVITY_HEADERS],
             actual: headers,

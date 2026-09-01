@@ -1,4 +1,4 @@
-import { copyFile, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import { copyFile, link, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 
@@ -78,6 +78,17 @@ describe('runNormalizeCommand', () => {
 
     await expect(
       runNormalizeCommand(copiedInput, { broker: 'robinhood', output: copiedInput }),
+    ).rejects.toBeInstanceOf(InputOverwriteError);
+    expect(await readFile(copiedInput, 'utf8')).toBe(before);
+  });
+
+  it('refuses an existing hardlink alias of the input as its output target', async () => {
+    const alias = join(temporaryDirectory, 'input alias.csv');
+    await link(copiedInput, alias);
+    const before = await readFile(copiedInput, 'utf8');
+
+    await expect(
+      runNormalizeCommand(copiedInput, { broker: 'robinhood', output: alias }),
     ).rejects.toBeInstanceOf(InputOverwriteError);
     expect(await readFile(copiedInput, 'utf8')).toBe(before);
   });
